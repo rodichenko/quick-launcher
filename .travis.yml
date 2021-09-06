@@ -2,4 +2,4 @@ language: node_js
 node_js:
   - 14
 script:
-  - npm build
+  - npm run-script build
