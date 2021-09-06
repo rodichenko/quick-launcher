@@ -1,7 +1,10 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
+import PropTypes from 'prop-types';
 import LoadingIndicator from './shared/loading-indicator';
-import {ApplicationsContext, UserContext} from './use-applications';
-import {SettingsContext} from './use-settings';
+import { ApplicationsContext, UserContext } from './use-applications';
+import { SettingsContext } from './use-settings';
 import Timer from './timer';
 import launchApplication from '../models/launch-application';
 import stopApplication from '../models/stop';
@@ -9,18 +12,17 @@ import stopRun from '../models/cloud-pipeline-api/stop-run';
 import fetchSettings from '../models/base/settings';
 import combineUrl from '../models/base/combine-url';
 import processString from '../models/process-string';
-import {StopRunsError} from '../models/find-user-run';
+import { StopRunsError } from '../models/find-user-run';
 import './components.css';
 
-function stopJobs (runs = []) {
-  const wrapStopRun = run => new Promise((resolve, reject) => {
+function stopJobs(runs = []) {
+  const wrapStopRun = (run) => new Promise((resolve, reject) => {
     stopRun(run.id)
       .then((payload) => {
         if (payload.status === 'OK') {
           return resolve();
-        } else {
-          reject(new Error(`Error stopping job${payload.message ? ': ' : '.'}${payload.message})`));
         }
+        throw new Error(`Error stopping job${payload.message ? ': ' : '.'}${payload.message})`);
       })
       .catch(reject);
   });
@@ -46,7 +48,7 @@ function getRedirectUrl(run, settings, options) {
   return run.url;
 }
 
-function useLaunch (application, user, options) {
+function useLaunch(application, user, options) {
   const [url, setUrl] = useState(undefined);
   const [error, setError] = useState(undefined);
   const [runId, setRunId] = useState(undefined);
@@ -59,14 +61,14 @@ function useLaunch (application, user, options) {
     setRunId(undefined);
     setStopRuns(undefined);
     setPolling(0);
-    setRetry(o => o + 1);
+    setRetry((o) => o + 1);
   }, [
     setUrl,
     setError,
     setRunId,
     setStopRuns,
     setPolling,
-    setRetry
+    setRetry,
   ]);
   useEffect(() => {
     if (application) {
@@ -80,7 +82,7 @@ function useLaunch (application, user, options) {
     if (application && user && !error && !url) {
       let timeout;
       fetchSettings()
-        .then(settings => {
+        .then((settings) => {
           launchApplication(application, user, options)
             .then((info) => {
               if (info && info.error) {
@@ -103,10 +105,10 @@ function useLaunch (application, user, options) {
                   }
                 }
                 interval = interval || DEFAULT_INTERVAL_MS;
-                timeout = setTimeout(setPolling, interval, o => o + 1);
+                timeout = setTimeout(setPolling, interval, (o) => o + 1);
               }
             })
-            .catch(e => {
+            .catch((e) => {
               console.error(e);
               setError(e.message);
               if (e instanceof StopRunsError) {
@@ -118,8 +120,9 @@ function useLaunch (application, user, options) {
         if (timeout) {
           clearTimeout(timeout);
         }
-      }
+      };
     }
+    return () => {};
   }, [
     polling,
     setPolling,
@@ -131,7 +134,7 @@ function useLaunch (application, user, options) {
     setError,
     options,
     setRunId,
-    retry
+    retry,
   ]);
   useEffect(() => {
     if (url) {
@@ -144,11 +147,11 @@ function useLaunch (application, user, options) {
     launchError: error,
     runId,
     stopRuns,
-    reLaunch
+    reLaunch,
   };
 }
 
-function useStopLaunch (application, user) {
+function useStopLaunch(application, user) {
   useEffect(() => {
     if (application && user) {
       return () => {
@@ -157,16 +160,19 @@ function useStopLaunch (application, user) {
           .then(() => {
             console.log('Application stopped', application.name, `(${user?.userName})`);
           })
-          .catch(console.error)
+          .catch(console.error);
       };
     }
+    return () => {};
   }, [application, user]);
 }
 
-export default function Application ({id: applicationId, name: appName, launchOptions, goBack}) {
+function Application({
+  id: applicationId, name: appName, launchOptions, goBack,
+}) {
   const applications = useContext(ApplicationsContext);
   const user = useContext(UserContext);
-  const [application] = (applications || []).filter(a => a.id === applicationId);
+  const [application] = (applications || []).filter((a) => a.id === applicationId);
   const [stopping, setStopping] = useState(false);
   const [error, setError] = useState(undefined);
   const {
@@ -174,7 +180,7 @@ export default function Application ({id: applicationId, name: appName, launchOp
     launchError,
     runId,
     stopRuns: stopRunsError,
-    reLaunch
+    reLaunch,
   } = useLaunch(application, user, launchOptions);
   const stopRunsAndReLaunch = useCallback(() => {
     if (stopRunsError && stopRunsError.runs && stopRunsError.runs.length) {
@@ -183,12 +189,12 @@ export default function Application ({id: applicationId, name: appName, launchOp
         .then(() => {
           reLaunch();
         })
-        .catch(e => {
+        .catch((e) => {
           setError(e.message);
         })
         .then(() => {
           setStopping(false);
-        })
+        });
     } else {
       reLaunch();
     }
@@ -199,13 +205,21 @@ export default function Application ({id: applicationId, name: appName, launchOp
     return (
       <div className="content error">
         <div className="header">
-          Application {applicationId} not found
+          Application
+          {' '}
+          {applicationId}
+          {' '}
+          not found
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details.
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
         </div>
       </div>
-    )
+    );
   }
   let content;
   const timer = (
@@ -217,8 +231,12 @@ export default function Application ({id: applicationId, name: appName, launchOp
   if (url) {
     content = (
       <div className="content">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
-        <span>Opening {appName || application.name}...</span>
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
+        <span>
+          Opening
+          {appName || application.name}
+          ...
+        </span>
       </div>
     );
   } else if (error) {
@@ -228,7 +246,13 @@ export default function Application ({id: applicationId, name: appName, launchOp
           Error stopping jobs
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details. <br/>
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
+          {' '}
+          <br />
           <span className="raw">{error}</span>
         </div>
       </div>
@@ -236,14 +260,14 @@ export default function Application ({id: applicationId, name: appName, launchOp
   } else if (stopping) {
     content = (
       <div className="content loading">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
         <span>Stopping jobs...</span>
       </div>
     );
   } else if (stopRunsError) {
     const {
       runs,
-      options
+      options,
     } = stopRunsError;
     let reason = 'using different parameters';
     if (options && options.nodeSize) {
@@ -256,7 +280,7 @@ export default function Application ({id: applicationId, name: appName, launchOp
             style={{
               fontFamily: 'monospace',
               color: '#ffffff',
-              marginLeft: 5
+              marginLeft: 5,
             }}
           >
             {options.placeholders.join(', ')}
@@ -271,27 +295,45 @@ export default function Application ({id: applicationId, name: appName, launchOp
         <div
           className="description"
         >
-          There {runs.length > 1 ? 'are' : 'is a'} running job{runs.length > 1 ? 's' : ''} {reason}.<br />
+          There
+          {' '}
+          {runs.length > 1 ? 'are' : 'is a'}
+          {' '}
+          running job
+          {runs.length > 1 ? 's' : ''}
+          {' '}
+          {reason}
+          .
+          <br />
           It shall be stopped before running a new instance.
         </div>
         <div
           className="description"
-          style={{color: '#aaaaaa', fontSize: 'smaller'}}
+          style={{ color: '#aaaaaa', fontSize: 'smaller' }}
         >
-          Stop current job{runs.length > 1 ? 's' : ''} and run a new one?
+          Stop current job
+          {runs.length > 1 ? 's' : ''}
+          {' '}
+          and run a new one?
         </div>
         <div
           className="stop-run-actions"
         >
           <div
+            role="button"
+            tabIndex={0}
             className="button"
             onClick={goBack}
+            onKeyPress={goBack}
           >
             CANCEL
           </div>
           <div
+            role="button"
+            tabIndex={0}
             className="button"
             onClick={stopRunsAndReLaunch}
+            onKeyPress={stopRunsAndReLaunch}
           >
             OK
           </div>
@@ -302,10 +344,18 @@ export default function Application ({id: applicationId, name: appName, launchOp
     content = (
       <div className="content error">
         <div className="header">
-          Error launching {appName || application.name}
+          Error launching
+          {' '}
+          {appName || application.name}
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details. <br/>
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
+          {' '}
+          <br />
           <span className="raw">{launchError}</span>
         </div>
       </div>
@@ -313,8 +363,12 @@ export default function Application ({id: applicationId, name: appName, launchOp
   } else {
     content = (
       <div className="content loading">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
-        <span>Launching {appName || application.name}...</span>
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
+        <span>
+          Launching
+          {appName || application.name}
+          ...
+        </span>
       </div>
     );
   }
@@ -347,3 +401,20 @@ export default function Application ({id: applicationId, name: appName, launchOp
     </div>
   );
 }
+
+Application.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  name: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  launchOptions: PropTypes.object,
+  goBack: PropTypes.func,
+};
+
+Application.defaultProps = {
+  id: undefined,
+  name: undefined,
+  launchOptions: {},
+  goBack: undefined,
+};
+
+export default Application;

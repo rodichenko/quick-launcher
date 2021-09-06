@@ -1,24 +1,24 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {useSettings} from '../use-settings';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSettings } from '../use-settings';
 import fetchMountsForPlaceholders from '../../models/parse-limit-mounts-placeholders-config';
 
 const ExtendedSettingsContext = React.createContext({});
-export {ExtendedSettingsContext};
+export { ExtendedSettingsContext };
 
-export default function useExtendedSettings () {
+export default function useExtendedSettings() {
   const settings = useSettings();
   const [placeholdersMounts, setPlaceholderMounts] = useState({});
   const placeholders = (settings?.limitMounts || '')
     .split(',')
-    .filter(o => Number.isNaN(Number(o)))
-    .filter(o => !/^(default|user_default_storage|current_user_default_storage)$/.test(o))
-    .map(placeholder => ({
+    .filter((o) => Number.isNaN(Number(o)))
+    .filter((o) => !/^(default|user_default_storage|current_user_default_storage)$/.test(o))
+    .map((placeholder) => ({
       placeholder,
       config: settings?.limitMountsPlaceholders
         ? settings.limitMountsPlaceholders[placeholder]
-        : undefined
+        : undefined,
     }))
-    .filter(o => !!o.config);
+    .filter((o) => !!o.config);
   useEffect(() => {
     if (placeholders.length > 0) {
       fetchMountsForPlaceholders(placeholders)
@@ -37,14 +37,14 @@ export default function useExtendedSettings () {
           values: nodeSizes,
           required: false,
           optionsField: 'nodeSize',
-          valuePresentation: (o => o)
+          valuePresentation: ((o) => o),
         });
       }
     }
-    placeholders.forEach(placeholder => {
+    placeholders.forEach((placeholder) => {
       const {
         placeholder: name,
-        config = {}
+        config = {},
       } = placeholder;
       const mounts = placeholdersMounts[name] || [];
       if (mounts.length > 0) {
@@ -55,18 +55,18 @@ export default function useExtendedSettings () {
           type: 'radio',
           default: Number(config.default),
           values: mounts,
-          itemName: storage => storage.name,
-          itemValue: storage => storage.id,
+          itemName: (storage) => storage.name,
+          itemValue: (storage) => storage.id,
           required: false,
           optionsField: `limitMountsPlaceholders.${name}`,
           valuePresentation(id) {
-            const itemValue = this.itemValue;
-            const item = (this.values || []).find(i => itemValue(i) === id);
+            const { itemValue } = this;
+            const item = (this.values || []).find((i) => itemValue(i) === id);
             if (item) {
               return this.itemName(item);
             }
             return id;
-          }
+          },
         });
       }
     });

@@ -1,13 +1,14 @@
-export default function removeExtraSlash (path, options = {}) {
+export default function removeExtraSlash(path, options = {}) {
   const {
     removeLeading = true,
-    removeTrailing = true
+    removeTrailing = true,
   } = options;
-  if (removeLeading && path.startsWith('/')) {
-    path = path.slice(1);
+  let modifiedPath = path;
+  if (removeLeading && modifiedPath.startsWith('/')) {
+    modifiedPath = modifiedPath.slice(1);
   }
-  if (removeTrailing && path.endsWith('/')) {
-    path = path.slice(0, -1);
+  if (removeTrailing && modifiedPath.endsWith('/')) {
+    modifiedPath = modifiedPath.slice(0, -1);
   }
-  return path;
+  return modifiedPath;
 }

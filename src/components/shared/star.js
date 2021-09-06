@@ -1,8 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function Star({className, onClick, children}) {
+function Star({ className, tabIndex, onClick, children }) {
   return (
     <div
+      tabIndex={tabIndex}
+      role="button"
+      onKeyPress={onClick}
       onClick={onClick}
       className={className}
     >
@@ -10,7 +14,7 @@ export default function Star({className, onClick, children}) {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-end'
+          alignItems: 'flex-end',
         }}
       >
         {children}
@@ -35,3 +39,19 @@ export default function Star({className, onClick, children}) {
     </div>
   );
 }
+
+Star.propTypes = {
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+  tabIndex: PropTypes.number,
+  children: PropTypes.node,
+};
+
+Star.defaultProps = {
+  className: undefined,
+  onClick: undefined,
+  children: undefined,
+  tabIndex: 0,
+};
+
+export default Star;

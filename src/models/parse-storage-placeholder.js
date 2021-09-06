@@ -1,4 +1,4 @@
-export default function parseStoragePlaceholder (placeholder, user, currentUser) {
+export default function parseStoragePlaceholder(placeholder, user, currentUser) {
   let dataStorageId;
   if (placeholder) {
     dataStorageId = placeholder;
@@ -7,17 +7,17 @@ export default function parseStoragePlaceholder (placeholder, user, currentUser)
         test: /^user_default_storage$/i,
         replace: user && user.defaultStorageId
           ? `${user.defaultStorageId}`
-          : undefined
+          : undefined,
       },
       {
         test: /^current_user_default_storage$/i,
         replace: currentUser && currentUser.defaultStorageId
           ? `${currentUser.defaultStorageId}`
-          : undefined
+          : undefined,
       },
     ]
-      .filter(o => o.replace);
-    const rule = replacements.find(r => r.test.test(placeholder));
+      .filter((o) => o.replace);
+    const rule = replacements.find((r) => r.test.test(placeholder));
     if (rule) {
       dataStorageId = rule.replace;
     }

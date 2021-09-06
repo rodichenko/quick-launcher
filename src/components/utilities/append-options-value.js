@@ -4,9 +4,13 @@ export default function appendOptionsValue(options, path, value) {
   }
   const [root, ...subPath] = path.split('.');
   if (subPath.length === 0) {
-    options[root] = value;
-    return options;
+    return {
+      ...options,
+      root: value,
+    };
   }
-  options[root] = appendOptionsValue(options[root] || {}, subPath.join('.'), value);
-  return options;
+  return {
+    ...options,
+    root: appendOptionsValue(options[root] || {}, subPath.join('.'), value),
+  };
 }

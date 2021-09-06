@@ -1,4 +1,5 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './components.css';
 import Gear from './shared/gear';
@@ -6,17 +7,18 @@ import Star from './shared/star';
 import useApplicationIcon from './utilities/use-application-icon';
 import UserAttributes from './shared/user-attributes';
 
-export default function FolderApplicationCard(
+function FolderApplicationCard(
   {
     application,
     className,
+    tabIndex,
     onEdit,
     onClick,
     isFavourite,
     onFavouriteClick,
     displayFavourite = true,
-    disabled
-  }
+    disabled,
+  },
 ) {
   if (!application || !application.name) {
     return null;
@@ -29,9 +31,9 @@ export default function FolderApplicationCard(
     published,
     url,
     storage,
-    info = {}
+    info = {},
   } = application;
-  const {icon} = useApplicationIcon(storage, iconFile ? iconFile.path : undefined);
+  const { icon } = useApplicationIcon(storage, iconFile ? iconFile.path : undefined);
   const onClickCallback = useCallback((e) => {
     if (onClick) {
       e.stopPropagation();
@@ -54,8 +56,9 @@ export default function FolderApplicationCard(
     }
   }, [application, onFavouriteClick]);
   const owner = info.user;
-  const ownerInfo = info.ownerInfo;
-  const Wrapper = ({children}) => {
+  const { ownerInfo } = info;
+  // eslint-disable-next-line react/prop-types
+  const Wrapper = ({ children }) => {
     if (!disabled && !onClick && published && url) {
       return (
         <a
@@ -72,6 +75,8 @@ export default function FolderApplicationCard(
   return (
     <Wrapper>
       <div
+        tabIndex={disabled ? -1 : tabIndex}
+        role="button"
         className={
           classNames(
             'app',
@@ -79,12 +84,13 @@ export default function FolderApplicationCard(
             {
               dark: DARK_MODE,
               published,
-              disabled
+              disabled,
             },
-            className
+            className,
           )
         }
         onClick={disabled ? undefined : onClickCallback}
+        onKeyPress={disabled ? undefined : onClickCallback}
       >
         <div className="layout">
           {
@@ -106,7 +112,7 @@ export default function FolderApplicationCard(
                   <span className="version">
                     {version}
                   </span>
-                    )
+                )
               }
             </div>
             <div className="app-description" title={description}>
@@ -116,7 +122,7 @@ export default function FolderApplicationCard(
               ownerInfo && (
                 <div className="app-owner" title={owner}>
                   <UserAttributes
-                    user={{attributes: ownerInfo}}
+                    user={{ attributes: ownerInfo }}
                     className="attributes"
                     attributeClassName="user-attribute"
                     skip={['email', 'e-mail']}
@@ -135,26 +141,28 @@ export default function FolderApplicationCard(
         </div>
         <div className="folder-app-actions-container">
           {
-            onEdit && (
-              <Gear
-                className={classNames('folder-app-action', 'folder-app-gear')}
-                onClick={onEditCallback}
-              />
-            )
-          }
-          {
             displayFavourite && (
               <Star
+                tabIndex={disabled ? -1 : tabIndex}
                 className={
                   classNames(
                     'folder-app-action',
                     'folder-app-star',
                     {
-                      'favourite': isFavourite
-                    }
+                      favourite: isFavourite,
+                    },
                   )
                 }
                 onClick={onFavouriteClickCallback}
+              />
+            )
+          }
+          {
+            onEdit && (
+              <Gear
+                tabIndex={disabled ? -1 : tabIndex}
+                className={classNames('folder-app-action', 'folder-app-gear')}
+                onClick={onEditCallback}
               />
             )
           }
@@ -163,3 +171,30 @@ export default function FolderApplicationCard(
     </Wrapper>
   );
 }
+
+FolderApplicationCard.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  application: PropTypes.object,
+  className: PropTypes.string,
+  tabIndex: PropTypes.number,
+  onEdit: PropTypes.func,
+  onClick: PropTypes.func,
+  isFavourite: PropTypes.bool,
+  onFavouriteClick: PropTypes.func,
+  displayFavourite: PropTypes.bool,
+  disabled: PropTypes.bool,
+};
+
+FolderApplicationCard.defaultProps = {
+  application: undefined,
+  className: undefined,
+  tabIndex: 0,
+  onEdit: undefined,
+  onClick: undefined,
+  isFavourite: false,
+  onFavouriteClick: undefined,
+  displayFavourite: true,
+  disabled: false,
+};
+
+export default FolderApplicationCard;

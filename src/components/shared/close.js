@@ -1,18 +1,22 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function Close(
+function Close(
   {
     className,
-    onClick
-  }
+    onClick,
+  },
 ) {
   return (
     <div
+      tabIndex={0}
+      role="button"
       onClick={onClick}
+      onKeyPress={onClick}
       className={className}
       style={{
         width: '1em',
-        height: '1em'
+        height: '1em',
       }}
     >
       <svg
@@ -22,7 +26,7 @@ export default function Close(
           stroke: 'currentColor',
           strokeWidth: 2,
           width: '100%',
-          height: '100%'
+          height: '100%',
         }}
       >
         <g>
@@ -37,9 +41,21 @@ export default function Close(
             cy="12"
             r="10"
           />
-          <path d="M8 8 L16 16 M8 16 L16 8"/>
+          <path d="M8 8 L16 16 M8 16 L16 8" />
         </g>
       </svg>
     </div>
   );
 }
+
+Close.propTypes = {
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+};
+
+Close.defaultProps = {
+  className: undefined,
+  onClick: undefined,
+};
+
+export default Close;

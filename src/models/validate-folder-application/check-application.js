@@ -1,10 +1,10 @@
 import apiCall from '../base/api-call';
 
-export default function checkApplication (endpoint, path, token) {
+export default function checkApplication(endpoint, path, token) {
   return apiCall(
     endpoint && endpoint.endsWith('/') ? endpoint : `${endpoint || ''}/`,
     {
-      target_folder: path
+      target_folder: path,
     },
     'GET',
     undefined,
@@ -12,8 +12,8 @@ export default function checkApplication (endpoint, path, token) {
       absoluteUrl: true,
       credentials: true,
       headers: {
-        bearer: token
-      }
-    }
+        bearer: token,
+      },
+    },
   );
 }

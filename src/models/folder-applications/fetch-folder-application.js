@@ -4,7 +4,7 @@ import getDataStorageContents from '../cloud-pipeline-api/data-storage-contents'
 import parseStoragePlaceholder from '../parse-storage-placeholder';
 import readApplicationInfo from './read-application-info';
 
-export default function fetchFolderApplication (path, settings) {
+export default function fetchFolderApplication(path, settings) {
   if (!settings || !settings.appConfigPath || !settings.appConfigStorage || !path) {
     return Promise.resolve();
   }
@@ -17,7 +17,7 @@ export default function fetchFolderApplication (path, settings) {
   const pathComponent = new PathComponent({
     path: appConfigPath,
     hasPlaceholders: true,
-    gatewaySpecFile: true
+    gatewaySpecFile: true,
   });
   let gatewaySpecFilePath = removeExtraSlash(path);
   if (!pathComponent.parsePathComponent(gatewaySpecFilePath)) {
@@ -33,18 +33,18 @@ export default function fetchFolderApplication (path, settings) {
     return Promise.resolve();
   }
   delete pathInfo[settings.folderApplicationUserPlaceholder];
-  const user = {userName};
+  const user = { userName };
   const folder = gatewaySpecFilePath.split('/').slice(0, -1).join('/');
   return new Promise((resolve) => {
     getDataStorageContents(storage, folder)
-      .then(contents => {
-        const icon = contents.find(o => /^gateway.(png|jpg|tiff|jpeg|svg)$/i.test(o.name));
+      .then((contents) => {
+        const icon = contents.find((o) => /^gateway.(png|jpg|tiff|jpeg|svg)$/i.test(o.name));
         const app = {
           icon,
           info: pathInfo,
           path: gatewaySpecFilePath,
-          storage
-        }
+          storage,
+        };
         return readApplicationInfo(app, user, settings);
       })
       .then(resolve);

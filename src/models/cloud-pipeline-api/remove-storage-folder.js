@@ -4,10 +4,10 @@ export default function removeStorageFolder(dataStorageId, path) {
   return new Promise((resolve, reject) => {
     apiDelete(
       `datastorage/${dataStorageId}/list?totally=false`,
-      [{path, type: 'Folder'}]
+      [{ path, type: 'Folder' }],
     )
       .then((result) => {
-        const {status, message, payload} = result;
+        const { status, message, payload } = result;
         if (status === 'OK') {
           resolve(payload);
         } else {

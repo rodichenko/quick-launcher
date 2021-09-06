@@ -21,7 +21,7 @@
   line-height: 34px;
   font-size: 10pt;
   padding: 0 10px;
-  transition: top .25s ease-in-out;
+  transition: top 0.25s ease-in-out;
   z-index: 100;
 }
 
@@ -153,12 +153,6 @@
   display: block;
 }
 
-.edit-application-container .input:not(.select):read-only,
-.edit-application-container .input:disabled,
-.edit-application-container .input.disabled {
-  pointer-events: none;
-}
-
 .edit-application-container .input:hover {
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.1);
@@ -172,6 +166,12 @@
 .edit-application-container .form-item .input {
   flex: 1;
   font-family: inherit;
+}
+
+.edit-application-container .input:disabled,
+.edit-application-container .input:not(.select):read-only,
+.edit-application-container .input.disabled {
+  pointer-events: none;
 }
 
 .edit-application-container .form-item .input::placeholder {
@@ -272,6 +272,22 @@
   background-color: rgba(255, 0, 0, 0.5);
   color: #400000;
   border-radius: 5px;
+}
+
+.validation-details-modal {
+  max-height: 80vh !important;
+  min-height: unset !important;
+  width: 80vw;
+  overflow: auto;
+  font-family: monospace;
+}
+
+.validation-details-modal p {
+  margin: 0;
+}
+
+.validation-details-modal p::before {
+  content: '> ';
 }
 
 .edit-application-validation-info {
@@ -422,23 +438,7 @@
 }
 
 .operation-modal {
-  min-height: unset!important;
-}
-
-.validation-details-modal {
-  max-height: 80vh!important;
-  min-height: unset!important;
-  width: 80vw;
-  overflow: auto;
-  font-family: monospace;
-}
-
-.validation-details-modal p {
-  margin: 0;
-}
-
-.validation-details-modal p::before {
-  content: '> ';
+  min-height: unset !important;
 }
 
 .operation-info {
@@ -449,7 +449,7 @@
 
 .operation-details {
   line-height: 16px;
-  height :16px;
+  height: 16px;
   font-size: small;
   display: flex;
   align-items: center;
@@ -472,5 +472,5 @@
 }
 
 .launch-folder-application-modal {
-  min-height: unset!important;
+  min-height: unset !important;
 }

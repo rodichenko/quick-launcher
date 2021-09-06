@@ -1,24 +1,32 @@
-import {useCallback, useEffect, useState, useMemo} from 'react';
-import {useSettings} from '../use-settings';
+import {
+  useCallback, useEffect, useState, useMemo,
+} from 'react';
+import { useSettings } from '../use-settings';
 import fetchMountsForPlaceholders from '../../models/parse-limit-mounts-placeholders-config';
 import folderApplicationPublish from '../../models/folder-application-publish';
 import folderApplicationUpdate from '../../models/folder-application-update';
 import folderApplicationRemove from '../../models/folder-application-remove';
 import useApplicationIcon from './use-application-icon';
-import fetchFolderApplication from "../../models/folder-applications/fetch-folder-application";
-import {useApplicationSession} from "../../models/validate-folder-application";
+import fetchFolderApplication from '../../models/folder-applications/fetch-folder-application';
+import { useApplicationSession } from '../../models/validate-folder-application';
 
 let newAttributeId = 0;
 
-function getInfoFieldTitle (field, settings) {
-  if (settings && settings.limitMountsPlaceholders && settings.limitMountsPlaceholders.hasOwnProperty(field)) {
+function getInfoFieldTitle(field, settings) {
+  if (
+    settings
+    && settings.limitMountsPlaceholders
+    && Object.prototype.hasOwnProperty.call(settings.limitMountsPlaceholders, field)) {
     return settings.limitMountsPlaceholders[field].title || field;
   }
   return field;
 }
 
-function getInfoFieldType (field, settings) {
-  if (settings && settings.limitMountsPlaceholders && settings.limitMountsPlaceholders.hasOwnProperty(field)) {
+function getInfoFieldType(field, settings) {
+  if (
+    settings
+    && settings.limitMountsPlaceholders
+    && Object.prototype.hasOwnProperty.call(settings.limitMountsPlaceholders, field)) {
     return 'select';
   }
   if (field === 'instance') {
@@ -30,13 +38,17 @@ function getInfoFieldType (field, settings) {
   return 'text';
 }
 
-function getInfoFieldValuesPromise (field, settings) {
-  if (settings && settings.limitMountsPlaceholders && settings.limitMountsPlaceholders.hasOwnProperty(field)) {
+function getInfoFieldValuesPromise(field, settings) {
+  if (
+    settings
+    && settings.limitMountsPlaceholders
+    && Object.prototype.hasOwnProperty.call(settings.limitMountsPlaceholders, field)
+  ) {
     const config = settings.limitMountsPlaceholders[field];
     return new Promise((resolve) => {
-      fetchMountsForPlaceholders([{config, placeholder: field}])
-        .then(o => {
-          resolve((o[field] || []).map(storage => storage.name));
+      fetchMountsForPlaceholders([{ config, placeholder: field }])
+        .then((o) => {
+          resolve((o[field] || []).map((storage) => storage.name));
         });
     });
   }
@@ -68,48 +80,46 @@ export default function useEditableApplication(application) {
   const [pathInfoInitial, setPathInfoInitial] = useState({});
   const [newOwnerInfo, setNewOwnerInfo] = useState(undefined);
   const setInfoField = useCallback((key, value) => {
-    setInfoFields(o => Object.assign({}, o, {[key]: value}));
+    setInfoFields((o) => ({ ...o, [key]: value }));
   }, [setInfoFields]);
-  const onChangeSource = useCallback(source => {
+  const onChangeSource = useCallback((source) => {
     const appPath = source || initialSource;
     if (appPath && settings) {
       setDisabled(true);
       fetchFolderApplication(appPath, settings)
-        .then(redistributeApplication => {
+        .then((redistributeApplication) => {
           if (redistributeApplication) {
             const {
-              iconFile = {},
-              name,
-              description,
-              fullDescription,
+              redistributeIconFile = {},
+              redistributeName,
+              redistributeDescription,
+              redistributeFullDescription,
               info = {},
-              pathInfo: redistributeApplicationPathInfo = {}
+              pathInfo: redistributeApplicationPathInfo = {},
             } = redistributeApplication || {};
             setIcon(undefined);
             setIconFile(undefined);
-            setAppIconPath(iconFile.path);
-            setName(name);
-            setDescription(description);
-            setFullDescription(fullDescription);
+            setAppIconPath(redistributeIconFile.path);
+            setName(redistributeName);
+            setDescription(redistributeDescription);
+            setFullDescription(redistributeFullDescription);
             setNewAttributes([]);
             setPathInfo(redistributeApplicationPathInfo);
-            setInfoFields(o => Object.assign(
-              {},
-              Object.keys(o || {})
-                .map(key => ({
+            setInfoFields((o) => ({
+
+              ...Object.keys(o || {})
+                .map((key) => ({
                   [key]: {
                     ...o[key],
-                    value: info[key] || ''
-                  }
+                    value: info[key] || '',
+                  },
                 }))
-                .reduce((r, c) => ({...r, ...c}), {}),
-              {
-                source: {
-                  ...(o.source || {}),
-                  value: info?.path || o?.source?.value
-                }
-              }
-            ));
+                .reduce((r, c) => ({ ...r, ...c }), {}),
+              source: {
+                ...(o.source || {}),
+                value: info?.path || o?.source?.value,
+              },
+            }));
           }
           setDisabled(false);
         });
@@ -125,7 +135,7 @@ export default function useEditableApplication(application) {
     setIcon,
     setIconFile,
     setPathInfo,
-    setNewOwnerInfo
+    setNewOwnerInfo,
   ]);
   const onChange = useCallback((key, value) => {
     if (/^name$/i.test(key)) {
@@ -148,16 +158,14 @@ export default function useEditableApplication(application) {
     } else if (/^source$/i.test(key)) {
       onChangeSource(value);
     } else {
-      setInfoFields(o => Object.assign(
-        {},
-        o,
-        {
-          [key]: {
-            ...(o[key] || {}),
-            value
-          }
-        }
-      ));
+      setInfoFields((o) => ({
+
+        ...o,
+        [key]: {
+          ...(o[key] || {}),
+          value,
+        },
+      }));
     }
   }, [
     setName,
@@ -168,7 +176,7 @@ export default function useEditableApplication(application) {
     setIconFile,
     setPathInfo,
     setNewOwnerInfo,
-    onChangeSource
+    onChangeSource,
   ]);
   const onRedistribute = useCallback((value) => {
     if (!value) {
@@ -180,48 +188,44 @@ export default function useEditableApplication(application) {
       setAppIconPath(undefined);
       setPathInfo(pathInfoInitial);
       setNewOwnerInfo(undefined);
-      setInfoFields(o => Object.assign(
-        {},
-        Object.keys(o || {})
-          .map(key => ({
+      setInfoFields((o) => ({
+
+        ...Object.keys(o || {})
+          .map((key) => ({
             [key]: {
               ...o[key],
-              value: o[key].initialValue
-            }
+              value: o[key].initialValue,
+            },
           }))
-          .reduce((r, c) => ({...r, ...c}), {}),
-        Object.values(settings?.folderApplicationPathAttributes || {})
-          .filter(pathKey => !/^(name|user)$/i.test(pathKey))
-          .map(pathKey => ({
+          .reduce((r, c) => ({ ...r, ...c }), {}),
+        ...Object.values(settings?.folderApplicationPathAttributes || {})
+          .filter((pathKey) => !/^(name|user)$/i.test(pathKey))
+          .map((pathKey) => ({
             [pathKey]: {
               ...(o[pathKey]),
-              value: (o[pathKey] || {}).initialValue
-            }
+              value: (o[pathKey] || {}).initialValue,
+            },
           }))
-          .reduce((r, c) => ({...r, ...c}), {}),
-        {
-          source: {
-            ...(o.source || {}),
-            redistribute: false,
-            value: (o.source || {}).initialValue
-          },
-          user: {
-            ...(o.user || {}),
-            value: (o.user || {}).initialValue
-          }
-        }
-      ));
+          .reduce((r, c) => ({ ...r, ...c }), {}),
+        source: {
+          ...(o.source || {}),
+          redistribute: false,
+          value: (o.source || {}).initialValue,
+        },
+        user: {
+          ...(o.user || {}),
+          value: (o.user || {}).initialValue,
+        },
+      }));
     } else {
-      setInfoFields(o => Object.assign(
-        {},
-        o,
-        {
-          source: {
-            ...(o.source || {}),
-            redistribute: true
-          },
-        }
-      ));
+      setInfoFields((o) => ({
+
+        ...o,
+        source: {
+          ...(o.source || {}),
+          redistribute: true,
+        },
+      }));
       onChangeSource();
     }
     setRedistribute(!!value);
@@ -241,43 +245,42 @@ export default function useEditableApplication(application) {
     descriptionInitial,
     fullDescriptionInitial,
     setIconFile,
-    setIcon
+    setIcon,
   ]);
   const addAttribute = useCallback(() => {
-    setNewAttributes(o => ([...(o || []), {id: ++newAttributeId}]));
+    newAttributeId += 1;
+    setNewAttributes((o) => ([...(o || []), { id: newAttributeId }]));
   }, [setNewAttributes]);
   const removeAttribute = useCallback((attribute) => {
-    setNewAttributes(o => (o || []).filter(oo => oo.id !== attribute.id));
+    setNewAttributes((o) => (o || []).filter((oo) => oo.id !== attribute.id));
   }, [setNewAttributes]);
   const onChangeAttribute = useCallback((attribute) => {
-    setNewAttributes(o => (o || []).map(oo => oo.id === attribute.id ? attribute : oo));
+    setNewAttributes((o) => (o || []).map((oo) => (oo.id === attribute.id ? attribute : oo)));
   }, [setNewAttributes]);
-  const isCommonAttributeName = useCallback((name) => {
-    return /^\s*(name|description|ownerinfo|fullDescription)\s*$/i.test(name);
-  }, []);
+  const isCommonAttributeName = useCallback((o) => /^\s*(name|description|ownerinfo|fullDescription)\s*$/i.test(o), []);
   const {
     icon: defaultIcon,
-    clearCache
+    clearCache,
   } = useApplicationIcon(
     application?.storage,
-    appIconPath || application?.iconFile?.path
-  )
+    appIconPath || application?.iconFile?.path,
+  );
   useEffect(() => {
     if (application && settings) {
       const {
-        name,
-        description,
-        fullDescription,
+        appName,
+        appDescription,
+        appFullDescription,
         info = {},
         readOnlyAttributes = [],
-        pathInfo: initialPathInfo = {}
+        pathInfo: initialPathInfo = {},
       } = application || {};
-      setName(name);
-      setNameInitial(name);
-      setDescription(description);
-      setDescriptionInitial(description);
-      setFullDescription(fullDescription);
-      setFullDescriptionInitial(fullDescription);
+      setName(appName);
+      setNameInitial(appName);
+      setDescription(appDescription);
+      setDescriptionInitial(appDescription);
+      setFullDescription(appFullDescription);
+      setFullDescriptionInitial(appFullDescription);
       setNewAttributes([]);
       setPathInfo(initialPathInfo);
       setPathInfoInitial(initialPathInfo);
@@ -287,13 +290,13 @@ export default function useEditableApplication(application) {
         Object.keys({
           ...(
             nodeSizes.length > 0
-              ? {instance: ''}
+              ? { instance: '' }
               : {}
           ),
-          ...limitMountsPlaceholders.reduce((r, c) => ({...r, [c]: ''}), {}),
-          ...info
+          ...limitMountsPlaceholders.reduce((r, c) => ({ ...r, [c]: '' }), {}),
+          ...info,
         })
-          .filter(key => !isCommonAttributeName(key))
+          .filter((key) => !isCommonAttributeName(key))
           .reduce((r, c) => ({
             ...r,
             [c]: {
@@ -302,9 +305,9 @@ export default function useEditableApplication(application) {
               initialValue: info[c],
               readOnly: readOnlyAttributes.includes(c),
               type: getInfoFieldType(c, settings),
-              valuesPromise: getInfoFieldValuesPromise(c, settings)
-            }
-          }), {})
+              valuesPromise: getInfoFieldValuesPromise(c, settings),
+            },
+          }), {}),
       );
       setInitialSource(info?.source);
       setPending(false);
@@ -323,43 +326,44 @@ export default function useEditableApplication(application) {
     isCommonAttributeName,
     setPending,
     setPathInfo,
-    setPathInfoInitial
+    setPathInfoInitial,
   ]);
-  const isReservedName = useCallback((name) => {
+  const isReservedName = useCallback((o) => {
     const names = Object.keys(infoFields || {})
       .concat(['name', 'description', 'fullDescription']);
-    const regExp = new RegExp(`^\s*(${names.join('|')})\s*$`, 'i')
-    return regExp.test(name);
+    // eslint-disable-next-line no-useless-escape
+    const regExp = new RegExp(`^\s*(${names.join('|')})\s*$`, 'i');
+    return regExp.test(o);
   }, [infoFields]);
   const publish = useCallback(() => {
     setDisabled(true);
     setOperation({
-      name: !application.published || redistribute ? 'Publishing...' : 'Updating...'
+      name: !application.published || redistribute ? 'Publishing...' : 'Updating...',
     });
     const applicationInfo = {
       source: application?.info?.source || application?.info?.path,
       ownerInfo: application?.info?.ownerInfo,
       ...(
         Object.entries(infoFields)
-          .filter(([, {value, readOnly}]) => value !== '' && value !== 'undefined' && !readOnly)
-          .map(([key, {value}]) => ({[key]: value}))
-          .reduce((r, c) => ({...r, ...c}), {})
+          .filter(([, { value, readOnly }]) => value !== '' && value !== 'undefined' && !readOnly)
+          .map(([key, { value }]) => ({ [key]: value }))
+          .reduce((r, c) => ({ ...r, ...c }), {})
       ),
       ...(
         attributes
-          .map(attribute => ({[attribute.name]: attribute.value}))
-          .reduce((r, c) => ({...r, ...c}), {})
+          .map((attribute) => ({ [attribute.name]: attribute.value }))
+          .reduce((r, c) => ({ ...r, ...c }), {})
       ),
       name,
       description,
       fullDescription,
-      user: infoFields?.user?.value || application?.info?.user
+      user: infoFields?.user?.value || application?.info?.user,
     };
     const appPayload = {
       ...application,
       info: {
-        ...(application.info || {})
-      }
+        ...(application.info || {}),
+      },
     };
     if (redistribute) {
       applicationInfo.source = infoFields.source?.value || applicationInfo.source;
@@ -371,13 +375,13 @@ export default function useEditableApplication(application) {
     if (iconFile) {
       clearCache();
     }
-    const progressCallback = (details, progress) => setOperation(o => ({
+    const progressCallback = (details, progress) => setOperation((o) => ({
       name: o.name,
       details,
-      progress: progress || o.progress
+      progress: progress || o.progress,
     }));
     return new Promise((resolve, reject) => {
-      let action = !application.published || redistribute
+      const action = !application.published || redistribute
         ? folderApplicationPublish
         : folderApplicationUpdate;
       action(settings, appPayload, applicationInfo, iconFile, true, progressCallback)
@@ -386,7 +390,7 @@ export default function useEditableApplication(application) {
           setOperation(false);
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           setDisabled(false);
           setOperation(false);
           reject(e);
@@ -408,7 +412,7 @@ export default function useEditableApplication(application) {
     setPathInfo,
     pathInfo,
     pathInfoInitial,
-    newOwnerInfo
+    newOwnerInfo,
   ]);
   const applicationPayload = useMemo(() => {
     const applicationInfo = {
@@ -416,25 +420,25 @@ export default function useEditableApplication(application) {
       ownerInfo: application?.info?.ownerInfo,
       ...(
         Object.entries(infoFields)
-          .filter(([, {value, readOnly}]) => value !== '' && value !== 'undefined' && !readOnly)
-          .map(([key, {value}]) => ({[key]: value}))
-          .reduce((r, c) => ({...r, ...c}), {})
+          .filter(([, { value, readOnly }]) => value !== '' && value !== 'undefined' && !readOnly)
+          .map(([key, { value }]) => ({ [key]: value }))
+          .reduce((r, c) => ({ ...r, ...c }), {})
       ),
       ...(
         attributes
-          .map(attribute => ({[attribute.name]: attribute.value}))
-          .reduce((r, c) => ({...r, ...c}), {})
+          .map((attribute) => ({ [attribute.name]: attribute.value }))
+          .reduce((r, c) => ({ ...r, ...c }), {})
       ),
       name,
       description,
       fullDescription,
-      user: infoFields?.user?.value || application?.info?.user
+      user: infoFields?.user?.value || application?.info?.user,
     };
     const appPayload = {
       ...application,
       info: {
-        ...(application.info || {})
-      }
+        ...(application.info || {}),
+      },
     };
     if (redistribute) {
       applicationInfo.source = infoFields.source?.value || applicationInfo.source;
@@ -454,16 +458,17 @@ export default function useEditableApplication(application) {
     redistribute,
     pathInfo,
     pathInfoInitial,
-    newOwnerInfo
+    newOwnerInfo,
   ]);
   const remove = useCallback(() => {
-    if (confirm(`Are you sure you want to remove application?`)) {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Are you sure you want to remove application?')) {
       setDisabled(true);
-      setOperation({name: 'Removing...'});
-      const progressCallback = (details, progress) => setOperation(o => ({
+      setOperation({ name: 'Removing...' });
+      const progressCallback = (details, progress) => setOperation((o) => ({
         name: o.name,
         details: details || o.details,
-        progress: progress || o.progress
+        progress: progress || o.progress,
       }));
       return new Promise((resolve, reject) => {
         folderApplicationRemove(application, settings, progressCallback)
@@ -476,11 +481,12 @@ export default function useEditableApplication(application) {
             setDisabled(false);
             setOperation(false);
             reject(e);
-          })
+          });
       });
     }
+    return () => Promise.resolve();
   }, [settings, application, setDisabled, setOperation]);
-  const {session, validate, stopValidation} = useApplicationSession(applicationPayload);
+  const { session, validate, stopValidation } = useApplicationSession(applicationPayload);
   return {
     info: {
       name,
@@ -488,7 +494,7 @@ export default function useEditableApplication(application) {
       fullDescription,
       infoFields,
       icon: icon || defaultIcon,
-      attributes
+      attributes,
     },
     disabled: disabled || (session && session.pending),
     addAttribute,
@@ -504,6 +510,6 @@ export default function useEditableApplication(application) {
     applicationPayload,
     validate,
     stopValidation,
-    validation: session
+    validation: session,
   };
 }

@@ -1,7 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import useAdvancedUser from './components/utilities/use-advanced-user';
-import {useSettings, SettingsContext} from './components/use-settings';
+import { useSettings, SettingsContext } from './components/use-settings';
 import useAuthenticatedUser from './components/utilities/user-authenticated-user';
 import useFolderApplications from './components/utilities/use-folder-applications';
 import LoadingIndicator from './components/shared/loading-indicator';
@@ -15,29 +16,38 @@ import LaunchFolderApplication from './components/shared/launch-folder-applicati
 import Help from './components/shared/help';
 import {
   FAValidationSessionsContext,
-  useSessions
+  useSessions,
 } from './models/validate-folder-application';
 import './components/components.css';
 import './app.css';
 
-function FolderApp ({location}) {
+function FolderApp({ location }) {
   const settings = useSettings();
   const sessions = useSessions(settings);
   const {
     authenticatedUser,
     pending: authenticating,
-    error: authenticationError
+    error: authenticationError,
   } = useAuthenticatedUser();
   const {
     canPublishApps,
-    canEditPublishedApps
+    canEditPublishedApps,
   } = useAdvancedUser(settings, authenticatedUser);
   const [options, setOptions] = useState({});
   const [selectApplication, setSelectApplication] = useState(false);
-  const [launchApplication, setLaunchApplication] = useState(false)
-  const onApplicationLaunchCancelled = useCallback(() => setLaunchApplication(false), [setLaunchApplication]);
-  const onPublishClick = useCallback(() => setSelectApplication(true), [setSelectApplication]);
-  const onClosePickUpApplication = useCallback(() => setSelectApplication(false), [setSelectApplication]);
+  const [launchApplication, setLaunchApplication] = useState(undefined);
+  const onApplicationLaunchCancelled = useCallback(
+    () => setLaunchApplication(undefined),
+    [setLaunchApplication],
+  );
+  const onPublishClick = useCallback(
+    () => setSelectApplication(true),
+    [setSelectApplication],
+  );
+  const onClosePickUpApplication = useCallback(
+    () => setSelectApplication(false),
+    [setSelectApplication],
+  );
   useEffect(() => {
     if (settings) {
       setOptions(settings.parseUrl(location.href));
@@ -46,7 +56,7 @@ function FolderApp ({location}) {
   const {
     applications,
     pending,
-    reload
+    reload,
   } = useFolderApplications(options);
   const [application, setApplication] = useState(undefined);
   const [filter, setFilter] = useState(undefined);
@@ -59,21 +69,20 @@ function FolderApp ({location}) {
     setSelectApplication(false);
     setApplication(app);
   }, [setApplication, setSelectApplication]);
-  const applicationIsEditable = useCallback((application) => {
-    return canEditPublishedApps ||
-      (application?.info?.user || '').toLowerCase() === (authenticatedUser?.userName || '').toLowerCase();
-  }, [canEditPublishedApps, authenticatedUser]);
+  const applicationIsEditable = useCallback((app) => canEditPublishedApps
+      || (app?.info?.user || '').toLowerCase() === (authenticatedUser?.userName || '').toLowerCase(), [canEditPublishedApps, authenticatedUser]);
   const {
     isFavourite,
     toggleFavourite,
-    sorter
+    sorter,
   } = useFavouriteApplications();
   let applicationsContent;
   let editApplicationContent;
+  const modalIsVisible = !!launchApplication || selectApplication;
   if (authenticating || pending) {
     applicationsContent = (
       <div className="content loading">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
         <span>Fetching applications list</span>
       </div>
     );
@@ -84,10 +93,14 @@ function FolderApp ({location}) {
           Authentication error
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details.
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
         </div>
       </div>
-    )
+    );
   } else if (application) {
     editApplicationContent = (
       <EditFolderApplication
@@ -103,10 +116,14 @@ function FolderApp ({location}) {
           No applications configured
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details.
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
         </div>
       </div>
-    )
+    );
   } else {
     applicationsContent = (
       <div
@@ -116,16 +133,17 @@ function FolderApp ({location}) {
           applications
             .filter(filterAppFn(filter))
             .sort(sorter)
-            .map((application) => (
+            .map((app) => (
               <FolderApplicationCard
-                key={application.id}
-                application={application}
+                key={app.id}
+                tabIndex={modalIsVisible ? -1 : 0}
+                application={app}
                 onEdit={
-                  applicationIsEditable(application)
+                  applicationIsEditable(app)
                     ? setApplication
                     : undefined
                 }
-                isFavourite={isFavourite(application)}
+                isFavourite={isFavourite(app)}
                 onFavouriteClick={toggleFavourite}
                 onClick={setLaunchApplication}
               />
@@ -142,7 +160,7 @@ function FolderApp ({location}) {
             className={
               classNames(
                 'static-header',
-                'displayed'
+                'displayed',
               )
             }
           >
@@ -150,6 +168,9 @@ function FolderApp ({location}) {
               application && (
                 <div
                   onClick={goBack}
+                  role="button"
+                  tabIndex={modalIsVisible ? -1 : 0}
+                  onKeyPress={goBack}
                   className="link"
                 >
                   BACK TO APPLICATIONS
@@ -163,8 +184,8 @@ function FolderApp ({location}) {
                     classNames(
                       'filter-applications',
                       {
-                        dark: DARK_MODE
-                      }
+                        dark: DARK_MODE,
+                      },
                     )
                   }
                 >
@@ -180,6 +201,9 @@ function FolderApp ({location}) {
               canPublishApps && !application && (
                 <div
                   className="link"
+                  role="button"
+                  tabIndex={modalIsVisible ? -1 : 0}
+                  onKeyPress={onPublishClick}
                   onClick={onPublishClick}
                 >
                   NEW APP
@@ -198,7 +222,7 @@ function FolderApp ({location}) {
             editApplicationContent && (
               <div
                 className="edit-application"
-                style={{position: 'relative'}}
+                style={{ position: 'relative' }}
               >
                 {editApplicationContent}
               </div>
@@ -206,7 +230,7 @@ function FolderApp ({location}) {
           }
           {
             applicationsContent && (
-              <div style={{position: 'relative'}}>
+              <div style={{ position: 'relative' }}>
                 {applicationsContent}
               </div>
             )
@@ -231,5 +255,11 @@ function FolderApp ({location}) {
     </FAValidationSessionsContext.Provider>
   );
 }
+
+FolderApp.propTypes = {
+  location: PropTypes.shape({
+    href: PropTypes.string,
+  }).isRequired,
+};
 
 export default FolderApp;

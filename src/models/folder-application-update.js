@@ -1,18 +1,19 @@
+/* eslint-disable no-param-reassign */
 import fetchFolderApplications from './fetch-folder-applications';
 import removeDataStorageItem from './cloud-pipeline-api/data-storage-item-remove';
 import combineUrl from './base/combine-url';
 import updateDataStorageItem from './cloud-pipeline-api/data-storage-item-update';
-import {safelyUpdateApplication} from './folder-applications-list';
+import { safelyUpdateApplication } from './folder-applications-list';
 
-function updateIcon (settings, application, destinationFolder, file) {
+function updateIcon(settings, application, destinationFolder, file) {
   if (!file || !application || !destinationFolder) {
     return Promise.resolve();
   }
   const destination = destinationFolder.endsWith('/') ? destinationFolder.slice(0, -1) : destinationFolder;
   const newFilePath = `${destination}/gateway.${file.name.split('.').pop()}`;
-  const uploadFile = (url, file) => new Promise((resolve) => {
+  const uploadFile = (url, uploadedFile) => new Promise((resolve) => {
     const formData = new FormData();
-    formData.append('file', file, `gateway.${file.name.split('.').pop()}`);
+    formData.append('file', uploadedFile, `gateway.${file.name.split('.').pop()}`);
     const request = new XMLHttpRequest();
     request.withCredentials = true;
     request.onreadystatechange = function () {
@@ -25,7 +26,7 @@ function updateIcon (settings, application, destinationFolder, file) {
   const safelyRemoveCurrentIcon = (path) => new Promise((resolve) => {
     removeDataStorageItem(
       application.storage,
-      path
+      path,
     )
       .then(resolve)
       .catch(() => resolve());
@@ -33,7 +34,7 @@ function updateIcon (settings, application, destinationFolder, file) {
   return new Promise((resolve) => {
     let removeCurrentIconPromise;
     if (application.iconFile && application.iconFile.path) {
-      const currentIconFilePath = `${destination}/${application.iconFile.path.split('/').pop()}`
+      const currentIconFilePath = `${destination}/${application.iconFile.path.split('/').pop()}`;
       removeCurrentIconPromise = safelyRemoveCurrentIcon(currentIconFilePath);
     } else {
       removeCurrentIconPromise = Promise.resolve();
@@ -42,13 +43,13 @@ function updateIcon (settings, application, destinationFolder, file) {
       .then(() => {
         const url = combineUrl(
           settings.api,
-          `datastorage/${application.storage}/list/upload?path=${destination}`
-        )
+          `datastorage/${application.storage}/list/upload?path=${destination}`,
+        );
         return uploadFile(url, file);
       })
       .then(() => {
         application.iconFile = {
-          path: newFilePath
+          path: newFilePath,
         };
       })
       .then(resolve)
@@ -59,13 +60,13 @@ function updateIcon (settings, application, destinationFolder, file) {
   });
 }
 
-export default function folderApplicationUpdate (
+export default function folderApplicationUpdate(
   settings,
   application,
   spec,
   icon,
   reloadApplications = true,
-  callback
+  callback,
 ) {
   if (!settings || !settings.serviceUser) {
     return Promise.reject(new Error('Service user is not defined'));
@@ -77,7 +78,7 @@ export default function folderApplicationUpdate (
     return Promise.reject(new Error('Application storage is not defined'));
   }
   const {
-    path: destinationGatewaySpec
+    path: destinationGatewaySpec,
   } = application;
   let destination = destinationGatewaySpec.split('/').slice(0, -1).join('/');
   if (!destination.endsWith('/')) {
@@ -87,29 +88,39 @@ export default function folderApplicationUpdate (
     Promise.resolve()
       .then(() => {
         if (icon) {
-          callback && callback('Updating icon', 0);
+          if (callback) {
+            callback('Updating icon', 0);
+          }
           return updateIcon(settings, application, destination, icon);
         }
         return Promise.resolve();
       })
       .then(() => {
-        callback && callback('Updating icon', 0.33);
+        if (callback) {
+          callback('Updating icon', 0.33);
+        }
         if (spec) {
-          callback && callback('Updating application info', 0.33);
+          if (callback) {
+            callback('Updating application info', 0.33);
+          }
           return updateDataStorageItem(
             application.storage,
             destinationGatewaySpec,
-            JSON.stringify(spec)
+            JSON.stringify(spec),
           );
         }
         return Promise.resolve();
       })
       .then(() => {
-        callback && callback('Updating metadata file...', 0.66);
+        if (callback) {
+          callback('Updating metadata file...', 0.66);
+        }
         return safelyUpdateApplication(settings, settings.serviceUser, application);
       })
       .then(() => {
-        callback && callback(undefined, 0.8);
+        if (callback) {
+          callback(undefined, 0.8);
+        }
         if (!reloadApplications) {
           return Promise.resolve();
         }
@@ -117,15 +128,17 @@ export default function folderApplicationUpdate (
         return fetchFolderApplications(
           settings,
           options,
-          {userName: settings.serviceUser},
-          true
+          { userName: settings.serviceUser },
+          true,
         );
       })
       .then(() => {
-        callback && callback(undefined, 1);
+        if (callback) {
+          callback(undefined, 1);
+        }
         resolve();
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e.message);
         reject(e);
       });

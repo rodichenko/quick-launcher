@@ -1,99 +1,33 @@
-import React, {useCallback, useContext, useState} from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { useCallback, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {ExtendedSettingsContext} from './utilities/use-extended-settings';
+import { ExtendedSettingsContext } from './utilities/use-extended-settings';
 import useAppExtendedSettings from './utilities/use-app-extended-settings';
 import LoadingIndicator from './shared/loading-indicator';
 import clearSessionInfo from '../models/clear-session-info';
 import Gear from './shared/gear';
+import SettingValue from './setting-value';
 import './components.css';
-import {useSettings} from "./use-settings";
+import { useSettings } from './use-settings';
 
-function Selection(
-  {
-    config,
-    value,
-    onChange = (() => {})
-  }
-) {
-  if (!config) {
-    return null;
-  }
-  const {
-    values = [],
-    itemValue = (o => o),
-    itemName = (o => o)
-  } = config;
-  if (!values.length) {
-    return null;
-  }
-  const handleClick = item => e => {
-    e && e.preventDefault();
-    e && e.stopPropagation();
-    const isSelected = itemValue(item) === value;
-    if (isSelected && !config.required) {
-      onChange && onChange(undefined);
-    } else {
-      onChange && onChange(itemValue(item));
-    }
-  };
-  return (
-    <>
-      {
-        values.map(item => (
-          <div
-            key={itemValue(item)}
-            className={
-              classNames(
-                'value',
-                {
-                  selected: itemValue(item) === value
-                }
-              )
-            }
-            onClick={handleClick(item)}
-          >
-            {itemName(item)}
-          </div>
-        ))
-      }
-    </>
-  );
-}
-
-function SettingValue({config, value, onChange}) {
-  if (!config) {
-    return null;
-  }
-  if (/^radio$/i.test(config.type)) {
-    return (
-      <Selection
-        config={config}
-        value={value}
-        onChange={onChange}
-      />
-    );
-  }
-  return null;
-}
-
-export default function ApplicationCard(
+function ApplicationCard(
   {
     application,
     onClick,
-    onOpenExtendedSettings,
-    options
-  }
+    options,
+  },
 ) {
   const {
     appendDefault,
     getSettingValue,
     options: extendedOptions,
-    onChange
+    onChange,
   } = useAppExtendedSettings(application);
   const appSettings = useSettings();
   const onChangeOptions = (setting, value) => {
     onChange(setting, value, true);
-  }
+  };
   const appExtendedSettings = useContext(ExtendedSettingsContext);
   const hasExtendedSettings = Object.keys(appExtendedSettings).length > 0;
   // const onExtendedSettingsClicked = useCallback((e) => {
@@ -102,30 +36,40 @@ export default function ApplicationCard(
   //   onOpenExtendedSettings && onOpenExtendedSettings(application);
   // }, [onOpenExtendedSettings, appExtendedSettings]);
   const onLaunch = useCallback(() => {
-    onClick && onClick(appendDefault(extendedOptions));
+    if (onClick) {
+      onClick(appendDefault(extendedOptions));
+    }
   }, [extendedOptions, appendDefault]);
   const [visible, setVisible] = useState(false);
   const showPopup = useCallback((e) => {
-    e && e.stopPropagation();
-    e && e.preventDefault();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setVisible(true);
   }, [setVisible]);
   const hidePopup = useCallback((e) => {
-    e && e.stopPropagation();
-    e && e.preventDefault();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setVisible(false);
   }, [setVisible]);
   const extendedOptionsPresentation = [];
-  for (let setting of appExtendedSettings) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (let s = 0; s < appExtendedSettings.length; s += 1) {
+    const setting = appExtendedSettings[s];
     const value = getSettingValue(setting);
-    const title = setting.title;
+    const { title } = setting;
     const valueStr = setting.valuePresentation(value || setting.default) || 'Default';
     extendedOptionsPresentation.push((
       <span
         key={setting.key}
         className="extended-setting-presentation"
       >
-        {title}: {valueStr}
+        {title}
+        :
+        {valueStr}
       </span>
     ));
   }
@@ -139,16 +83,16 @@ export default function ApplicationCard(
       appSettings,
       {
         ...options,
-        ...appendDefault(extendedOptions)
-      }
+        ...appendDefault(extendedOptions),
+      },
     )
       .then(() => {
         setClearingSessionInfo(false);
       })
-      .catch(e => {
-        console.error(e);
+      .catch((error) => {
+        console.error(error);
         setClearingSessionInfo(false);
-      })
+      });
   }, [
     setClearingSessionInfo,
     clearSessionInfo,
@@ -156,25 +100,26 @@ export default function ApplicationCard(
     appExtendedSettings,
     extendedOptions,
     appendDefault,
-    options
+    options,
   ]);
   const hasSessionInfoSettings = appSettings?.sessionInfoStorage && appSettings?.sessionInfoPath;
   return (
     <div
+      tabIndex={0}
+      role="button"
       className={`app ${DARK_MODE ? 'dark' : ''}`}
       onClick={onLaunch}
+      onKeyPress={onLaunch}
     >
       {
         application.background && (
           <div
             className="background"
             style={
-              Object.assign(
-                {
-                  backgroundImage: `url("${application.background}")`
-                },
-                application.backgroundStyle || {}
-              )
+              ({
+                backgroundImage: `url("${application.background}")`,
+                ...application.backgroundStyle || {},
+              })
             }
           >
             {'\u00A0'}
@@ -201,13 +146,13 @@ export default function ApplicationCard(
           )
         }
         <span className="name">
-            {application.name}
-          </span>
+          {application.name}
+        </span>
         {
           application.version && (
             <span className="version">
                 {application.version}
-              </span>
+            </span>
           )
         }
       </div>
@@ -222,32 +167,40 @@ export default function ApplicationCard(
                 {extendedOptionsPresentation}
               </Gear>
               <div
-                className={classNames('overlay', {visible})}
+                tabIndex={0}
+                role="button"
+                className={classNames('overlay', { visible })}
                 onClick={hidePopup}
+                onKeyPress={hidePopup}
               >
                 {'\u00A0'}
               </div>
               <div
-                className={classNames('popup', {visible})}
+                tabIndex={0}
+                role="button"
+                className={classNames('popup', { visible })}
                 onClick={hidePopup}
+                onKeyPress={hidePopup}
               >
                 {
                   appExtendedSettings.map((setting, index, array) => [
+                    // eslint-disable-next-line react/no-array-index-key
                     <div key={`${setting.key}-${index}`} className="setting">
                       <div className="setting-title">
-                        {setting.title}:
+                        {setting.title}
+                        :
                       </div>
                       <div
                         className={
                           classNames(
                             'setting-value',
-                            setting?.type
+                            setting?.type,
                           )
                         }
                       >
                         <SettingValue
                           config={setting}
-                          onChange={value => onChangeOptions(setting, value)}
+                          onChange={(value) => onChangeOptions(setting, value)}
                           value={getSettingValue(setting)}
                         />
                       </div>
@@ -259,22 +212,28 @@ export default function ApplicationCard(
                       >
                         {'\u00A0'}
                       </div>
-                    ) : undefined
+                    ) : undefined,
                   ]).reduce((r, c) => ([...r, ...c]), [])
                 }
                 {
                   hasExtendedSettings && hasSessionInfoSettings && (
                     <div
                       className="settings-main-divider"
-                    >
-                    </div>
+                    />
                   )
                 }
                 {
                   hasSessionInfoSettings && (
                     <div
                       className="app-session-info"
+                      tabIndex={0}
+                      role="button"
                       onClick={
+                        clearingSessionInfo
+                          ? undefined
+                          : clearSessionInfoCallback
+                      }
+                      onKeyPress={
                         clearingSessionInfo
                           ? undefined
                           : clearSessionInfoCallback
@@ -291,7 +250,7 @@ export default function ApplicationCard(
                                 fill: '#aaa',
                                 width: 8,
                                 height: 8,
-                                marginLeft: 5
+                                marginLeft: 5,
                               }}
                             />
                           </>
@@ -315,3 +274,19 @@ export default function ApplicationCard(
     </div>
   );
 }
+
+ApplicationCard.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  application: PropTypes.object,
+  onClick: PropTypes.func,
+  // eslint-disable-next-line react/forbid-prop-types
+  options: PropTypes.object,
+};
+
+ApplicationCard.defaultProps = {
+  application: undefined,
+  onClick: undefined,
+  options: undefined,
+};
+
+export default ApplicationCard;

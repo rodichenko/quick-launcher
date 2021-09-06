@@ -11,10 +11,10 @@ export default function getDataStorageItemContent(dataStorageId, path) {
   return new Promise((resolve, reject) => {
     apiGet(
       `datastorage/${dataStorageId}/content`,
-      {path: path ? removeLeadingSlash(path) : undefined}
-      )
-      .then(result => {
-        const {status, message, payload = []} = result;
+      { path: path ? removeLeadingSlash(path) : undefined },
+    )
+      .then((result) => {
+        const { status, message, payload = [] } = result;
         if (status === 'OK') {
           if (payload.content) {
             try {

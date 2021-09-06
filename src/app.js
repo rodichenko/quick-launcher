@@ -1,8 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {useApplications, ApplicationsContext, UserContext} from './components/use-applications';
-import {useSettings, SettingsContext} from './components/use-settings';
-import useExtendedSettings, {ExtendedSettingsContext} from './components/utilities/use-extended-settings';
+import { useApplications, ApplicationsContext, UserContext } from './components/use-applications';
+import { useSettings, SettingsContext } from './components/use-settings';
+import useExtendedSettings, { ExtendedSettingsContext } from './components/utilities/use-extended-settings';
 import useDefaultLaunchExtendedSettings from './components/utilities/use-default-launch-extended-options';
 import Application from './components/application';
 import LoadingIndicator from './components/shared/loading-indicator';
@@ -11,28 +12,30 @@ import LaunchForm from './components/launch-form';
 import './components/components.css';
 import './app.css';
 
-function App({launch, location}) {
+function App({ launch, location }) {
   const settings = useSettings();
   const appExtendedSettings = useExtendedSettings();
   const [launchExtendedOptions, setLaunchExtendedOptions] = useDefaultLaunchExtendedSettings(
-    appExtendedSettings
+    appExtendedSettings,
   );
   const [
     launchFormApp,
-    setLaunchFormApp
+    setLaunchFormApp,
   ] = useState(undefined);
   const [application, setApplication] = useState(undefined);
-  const {applications, error, pending, user} = useApplications();
-  const onOpenExtendedLaunchSettings = useCallback((application) => {
-    setLaunchFormApp(application);
+  const {
+    applications, error, pending, user,
+  } = useApplications();
+  const onOpenExtendedLaunchSettings = useCallback((app) => {
+    setLaunchFormApp(app);
   }, [setLaunchFormApp]);
   const back = useCallback(() => {
     setApplication(undefined);
     setLaunchFormApp(undefined);
   }, [setApplication, setLaunchFormApp]);
-  const onSelectApplication = useCallback((application, extended) => {
+  const onSelectApplication = useCallback((app, extended) => {
     setLaunchExtendedOptions(extended);
-    setApplication(application);
+    setApplication(app);
   }, [setApplication, setLaunchExtendedOptions]);
   const onSetExtendedOptions = useCallback((options) => {
     if (launchFormApp) {
@@ -49,11 +52,11 @@ function App({launch, location}) {
   }, [location.href, settings]);
   useEffect(() => {
     if (launch && settings && !application && applications.length > 0 && user) {
-      const {image} = settings.parseUrl(location.href);
+      const { image } = settings.parseUrl(location.href);
       const [firstApplication] = applications;
       let appToUse;
       if (image) {
-        [appToUse] = applications.filter(a => (new RegExp(`^${image}$`, 'i')).test(a.name));
+        [appToUse] = applications.filter((a) => (new RegExp(`^${image}$`, 'i')).test(a.name));
       }
       if (!appToUse && applications.length > 1) {
         console.warn(`${applications.length} applications available! The first application will be used`);
@@ -65,7 +68,8 @@ function App({launch, location}) {
       setApplication(appToUse.id);
     }
   }, [application, applications, user, launch, setApplication, settings]);
-  let app, launchUser;
+  let app; let
+    launchUser;
   let options = {};
   if (settings) {
     options = settings.parseUrl(location.href);
@@ -77,7 +81,7 @@ function App({launch, location}) {
   if (pending) {
     applicationsContent = (
       <div className="content loading">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
         <span>Fetching applications list</span>
       </div>
     );
@@ -88,11 +92,17 @@ function App({launch, location}) {
           Error fetching applications list
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details. <br/>
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
+          {' '}
+          <br />
           <span className="raw">{error}</span>
         </div>
       </div>
-    )
+    );
   } else if (applications.length === 0) {
     applicationsContent = (
       <div className="content error">
@@ -100,10 +110,14 @@ function App({launch, location}) {
           No applications configured
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details.
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
         </div>
       </div>
-    )
+    );
   } else if (!user || !user.userName) {
     applicationsContent = (
       <div className="content error">
@@ -111,10 +125,14 @@ function App({launch, location}) {
           Authentication error
         </div>
         <div className="description">
-          Please, contact {settings?.supportName || 'support team'} for details.
+          Please, contact
+          {' '}
+          {settings?.supportName || 'support team'}
+          {' '}
+          for details.
         </div>
       </div>
-    )
+    );
   } else if (!launch && launchFormApp) {
     applicationsContent = (
       <LaunchForm
@@ -128,22 +146,22 @@ function App({launch, location}) {
         className="apps"
       >
         {
-          applications.map((application) => (
+          applications.map((applicationItem) => (
             <ApplicationCard
-              key={application.id}
-              application={application}
-              onClick={(extended) => onSelectApplication(application.id, extended)}
+              key={applicationItem.id}
+              application={applicationItem}
+              onClick={(extended) => onSelectApplication(applicationItem.id, extended)}
               onOpenExtendedSettings={onOpenExtendedLaunchSettings}
               options={options}
             />
           ))
         }
       </div>
-    )
+    );
   } else if (!application) { // e.g. if (launch && !application)
     applicationsContent = (
       <div className="content loading">
-        <LoadingIndicator style={{marginRight: 5, width: 15, height: 15}} />
+        <LoadingIndicator style={{ marginRight: 5, width: 15, height: 15 }} />
         <span>Fetching application</span>
       </div>
     );
@@ -161,14 +179,17 @@ function App({launch, location}) {
                     'static-header',
                     {
                       displayed: (!!application || !!launchFormApp)
-                        && !launch
-                    }
+                        && !launch,
+                    },
                   )
                 }
               >
                 <div
+                  tabIndex={0}
+                  role="button"
                   onClick={back}
                   className="link"
+                  onKeyPress={back}
                 >
                   BACK TO APPLICATIONS
                 </div>
@@ -181,14 +202,14 @@ function App({launch, location}) {
                 )
               }
               {
-                !application && (<div style={{position: 'relative'}}>{applicationsContent}</div>)
+                !application && (<div style={{ position: 'relative' }}>{applicationsContent}</div>)
               }
               {
                 !!application && (
                   <Application
                     id={application}
                     name={appName}
-                    launchOptions={Object.assign({__launch__: launch}, options, launchExtendedOptions)}
+                    launchOptions={({ __launch__: launch, ...options, ...launchExtendedOptions })}
                     goBack={back}
                   />
                 )
@@ -200,5 +221,16 @@ function App({launch, location}) {
     </SettingsContext.Provider>
   );
 }
+
+App.propTypes = {
+  launch: PropTypes.bool,
+  location: PropTypes.shape({
+    href: PropTypes.string,
+  }).isRequired,
+};
+
+App.defaultProps = {
+  launch: false,
+};
 
 export default App;

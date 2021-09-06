@@ -1,4 +1,4 @@
-export default function parseRunServiceUrl (url) {
+export default function parseRunServiceUrl(url) {
   if (!url) {
     return [];
   }
@@ -12,9 +12,9 @@ export default function parseRunServiceUrl (url) {
   try {
     return JSON.parse(url);
   } catch (__) {
-    return url.split(';').map(part => ({
+    return url.split(';').map((part) => ({
       name: null,
-      url: part
+      url: part,
     }));
   }
 }

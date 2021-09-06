@@ -1,34 +1,35 @@
+/* eslint-disable no-underscore-dangle */
 import parseLimitMounts from './limit-mounts-parser';
 
 class StopRunsError extends Error {
   constructor(runs = [], description, options) {
-    const runsIds = runs.map(run => `#${run.id}`).join(', ');
+    const runsIds = runs.map((run) => `#${run.id}`).join(', ');
     super(
-      `${description}${description ? '. ' : ''}You should stop ${runsIds} run${runs.length > 1 ? 's' : ''}`
+      `${description}${description ? '. ' : ''}You should stop ${runsIds} run${runs.length > 1 ? 's' : ''}`,
     );
     this.options = options;
     this.runs = runs;
   }
 }
 
-export {StopRunsError};
+export { StopRunsError };
 
-function filterByNodeSize (instance) {
-  return function filter (run) {
+function filterByNodeSize(instance) {
+  return function filter(run) {
     return !instance || run?.instance?.nodeType === instance;
-  }
+  };
 }
 
-function filterByPlaceholder (name, value) {
-  return function filter (run) {
-    return !!run &&
-      !!run.pipelineRunParameters &&
-      !!run.pipelineRunParameters.find(p => p.name === name && `${p.value || ''}` === `${value || ''}`);
-  }
+function filterByPlaceholder(name, value) {
+  return function filter(run) {
+    return !!run
+      && !!run.pipelineRunParameters
+      && !!run.pipelineRunParameters.find((p) => p.name === name && `${p.value || ''}` === `${value || ''}`);
+  };
 }
 
-export function findUserRun (runs, appSettings, user, options) {
-  if (options.__validation__) {
+export function findUserRun(runs, appSettings, user, options) {
+  if (options?.__validation__) {
     return undefined;
   }
   if (options?.__launch__) {
@@ -39,13 +40,12 @@ export function findUserRun (runs, appSettings, user, options) {
   }
   if (runs.length > 0) {
     const {
-      result: parsed,
-      replacements = []
+      replacements = [],
     } = parseLimitMounts(
       appSettings.limitMounts,
       undefined,
       user,
-      options.limitMountsPlaceholders
+      options.limitMountsPlaceholders,
     );
     const instance = appSettings?.appConfigNodeSizes && options?.nodeSize
       ? appSettings.appConfigNodeSizes[options?.nodeSize]
@@ -55,11 +55,11 @@ export function findUserRun (runs, appSettings, user, options) {
       throw new StopRunsError(
         runs,
         `There ${runs.length > 1 ? 'are' : 'is an'} already running job${runs.length > 1 ? 's' : ''} with the different node size`,
-        {nodeSize: true}
+        { nodeSize: true },
       );
     }
     const errorOptions = {
-      placeholders: []
+      placeholders: [],
     };
     Object.entries(replacements || {}).forEach(([name, value]) => {
       if (matchedRuns.length > 0) {
@@ -68,9 +68,9 @@ export function findUserRun (runs, appSettings, user, options) {
           matchedRuns.length === 0
         ) {
           if (
-            appSettings.limitMountsPlaceholders &&
-            appSettings.limitMountsPlaceholders[name] &&
-            appSettings.limitMountsPlaceholders[name].title
+            appSettings.limitMountsPlaceholders
+            && appSettings.limitMountsPlaceholders[name]
+            && appSettings.limitMountsPlaceholders[name].title
           ) {
             errorOptions.placeholders.push(appSettings.limitMountsPlaceholders[name].title);
           } else {
@@ -83,7 +83,7 @@ export function findUserRun (runs, appSettings, user, options) {
       throw new StopRunsError(
         runs,
         `There ${runs.length > 1 ? 'are' : 'is an'} already running job${runs.length > 1 ? 's' : ''} with different libraries`,
-        errorOptions
+        errorOptions,
       );
     }
     return matchedRuns[0];

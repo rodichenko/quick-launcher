@@ -1,9 +1,9 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-import "isomorphic-fetch";
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import 'isomorphic-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router} from '@reach/router';
+import { Router } from '@reach/router';
 import ModeSelector from './mode-selector';
 
 ReactDOM.render(
@@ -13,5 +13,5 @@ ReactDOM.render(
       <ModeSelector path="/*" launch />
     </Router>
   ),
-  document.getElementById('root')
+  document.getElementById('root'),
 );

@@ -1,9 +1,10 @@
 import processString from './process-string';
 
-function removeExtraSlash (string) {
+function removeExtraSlash(string) {
   if (!string) {
     return string;
   }
+  // eslint-disable-next-line no-useless-escape
   return string.replace(/\/[\/]+/g, '/').replace(/[\/]+$/, '');
 }
 

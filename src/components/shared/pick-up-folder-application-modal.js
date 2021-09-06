@@ -1,8 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Modal from './modal';
 import useAuthenticatedUser from '../utilities/user-authenticated-user';
-import {useSettings} from '../use-settings';
+import { useSettings } from '../use-settings';
 import getUsersInfo from '../../models/cloud-pipeline-api/get-users-info';
 import useFolderApplications from '../utilities/use-folder-applications';
 import FolderApplicationCard from '../folder-application-card';
@@ -11,29 +12,28 @@ import filterAppFn from '../utilities/filter-applications-fn';
 import UserAttributes from './user-attributes';
 import './pick-up-folder-application-modal.css';
 
-function filterUserFn (filter) {
-  return function (user) {
-    return !filter ||
-      (user.name || '').toLowerCase().includes(filter.toLowerCase()) ||
-      !!Object.values(user.attributes || {})
-        .find(attributeValue => (attributeValue || '').toLowerCase()
-          .includes(filter.toLowerCase())
-        )
+function filterUserFn(filter) {
+  return function filterFn(user) {
+    return !filter
+      || (user.name || '').toLowerCase().includes(filter.toLowerCase())
+      || !!Object.values(user.attributes || {})
+        .find((attributeValue) => (attributeValue || '').toLowerCase()
+          .includes(filter.toLowerCase()));
   };
 }
 
-export default function PickUpFolderApplicationModal (
+function PickUpFolderApplicationModal(
   {
     visible,
     onClose,
     onSelectApplication,
-    ignoredApplications = []
-  }
+    ignoredApplications = [],
+  },
 ) {
   const {
     authenticatedUser,
     pending: authenticating,
-    error: authenticationError
+    error: authenticationError,
   } = useAuthenticatedUser();
   const settings = useSettings();
   const [user, setUser] = useState(undefined);
@@ -44,23 +44,23 @@ export default function PickUpFolderApplicationModal (
   const onFilterChange = useCallback((e) => setFilter(e.target.value), [setFilter]);
   const onAppsFilterChange = useCallback((e) => setAppsFilter(e.target.value), [setAppsFilter]);
   const {
-    canEditPublishedApps: userSelectionAvailable
+    canEditPublishedApps: userSelectionAvailable,
   } = useAdvancedUser(settings, authenticatedUser);
   useEffect(() => {
     if (authenticatedUser && visible) {
       setPending(true);
       if (userSelectionAvailable) {
         getUsersInfo()
-          .then((users) => {
-            setUsers(users);
+          .then((result) => {
+            setUsers(result);
           })
-          .catch(e => {
+          .catch((e) => {
             console.error(e.message);
             setUser(authenticatedUser);
           })
           .then(() => {
             setPending(false);
-          })
+          });
       } else {
         setUser(authenticatedUser);
         setPending(false);
@@ -72,10 +72,10 @@ export default function PickUpFolderApplicationModal (
     setUser,
     settings,
     setPending,
-    visible
+    visible,
   ]);
   const selectUser = useCallback((selectedUser) => {
-    setUser(selectedUser ? {...selectedUser, userName: selectedUser.name} : undefined);
+    setUser(selectedUser ? { ...selectedUser, userName: selectedUser.name } : undefined);
     setFilter(undefined);
     setAppsFilter(undefined);
   }, [setUser, setFilter, setAppsFilter]);
@@ -85,6 +85,7 @@ export default function PickUpFolderApplicationModal (
     }
   }, [visible, userSelectionAvailable, selectUser]);
   const [options, setOptions] = useState({});
+  const { location } = document;
   useEffect(() => {
     if (settings) {
       setOptions(settings.parseUrl(location.href));
@@ -92,8 +93,9 @@ export default function PickUpFolderApplicationModal (
   }, [location.href, settings, setOptions]);
   const {
     applications,
-    pending: applicationsPending
+    pending: applicationsPending,
   } = useFolderApplications(options, false, ...(user ? [user] : []));
+  const title = user ? `Select ${user.userName}'s application` : 'Select user';
   return (
     <Modal
       visible={visible}
@@ -101,7 +103,7 @@ export default function PickUpFolderApplicationModal (
       title={
         pending
           ? false
-          : (user ? `Select ${user.userName}'s application` : 'Select user')
+          : title
       }
       className="pick-up-application-modal"
       closeButton
@@ -134,17 +136,20 @@ export default function PickUpFolderApplicationModal (
               {
                 (users || [])
                   .filter(filterUserFn(filter))
-                  .map(filteredUser => (
+                  .map((filteredUser) => (
                     <div
                       key={filteredUser.name}
                       className={
                         classNames(
                           'user',
                           {
-                            current: filteredUser.name === authenticatedUser?.userName
-                          }
+                            current: filteredUser.name === authenticatedUser?.userName,
+                          },
                         )
                       }
+                      role="button"
+                      tabIndex={0}
+                      onKeyPress={() => selectUser(filteredUser)}
                       onClick={() => selectUser(filteredUser)}
                     >
                       <div>{filteredUser.name}</div>
@@ -175,6 +180,9 @@ export default function PickUpFolderApplicationModal (
                 userSelectionAvailable && (
                   <div
                     className="back-to-users"
+                    tabIndex={0}
+                    role="button"
+                    onKeyPress={() => selectUser(undefined)}
                     onClick={() => selectUser(undefined)}
                   >
                     {'< BACK'}
@@ -198,12 +206,12 @@ export default function PickUpFolderApplicationModal (
               {
                 applications
                   .filter(filterAppFn(appsFilter))
-                  .map(application => (
+                  .map((application) => (
                     <FolderApplicationCard
                       className={
                         classNames(
                           'pick-up-application',
-                          {ignored: ignoredApplications.includes(application.id)}
+                          { ignored: ignoredApplications.includes(application.id) },
                         )
                       }
                       disabled={ignoredApplications.includes(application.id)}
@@ -225,3 +233,20 @@ export default function PickUpFolderApplicationModal (
     </Modal>
   );
 }
+
+PickUpFolderApplicationModal.propTypes = {
+  visible: PropTypes.bool,
+  onClose: PropTypes.func,
+  onSelectApplication: PropTypes.func,
+  // eslint-disable-next-line react/forbid-prop-types
+  ignoredApplications: PropTypes.array,
+};
+
+PickUpFolderApplicationModal.defaultProps = {
+  visible: false,
+  onClose: undefined,
+  onSelectApplication: undefined,
+  ignoredApplications: [],
+};
+
+export default PickUpFolderApplicationModal;

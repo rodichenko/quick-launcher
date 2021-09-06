@@ -2,14 +2,14 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState
+  useState,
 } from 'react';
-import {ExtendedSettingsContext} from './use-extended-settings';
+import { ExtendedSettingsContext } from './use-extended-settings';
 import appendOptionsValue from './append-options-value';
 import readOptionsValue from './read-options-value';
 
 function getKey(key) {
-  return `gateway-launch-options-${key}`
+  return `gateway-launch-options-${key}`;
 }
 
 function getLocalStorageValue(key) {
@@ -24,16 +24,17 @@ function setLocalStorageValue(key, value) {
   localStorage.setItem(getKey(key), JSON.stringify(value));
 }
 
-export default function useAppExtendedSettings (application) {
+export default function useAppExtendedSettings(application) {
   const appExtendedSettings = useContext(ExtendedSettingsContext);
   const [options, setOptions] = useState({});
   useEffect(() => {
     if (application && appExtendedSettings) {
       const opts = {};
-      for (const setting of appExtendedSettings) {
-        const {key} = setting;
+      for (let s = 0; s < appExtendedSettings.length; s += 1) {
+        const setting = appExtendedSettings[s];
+        const { key } = setting;
         const storageValue = getLocalStorageValue(key);
-        if (storageValue.hasOwnProperty(application.id)) {
+        if (Object.prototype.hasOwnProperty.call(storageValue, application.id)) {
           appendOptionsValue(opts, setting.optionsField, storageValue[application.id]);
         }
       }
@@ -42,8 +43,9 @@ export default function useAppExtendedSettings (application) {
   }, [application, appExtendedSettings, setOptions]);
   const save = useCallback((opts) => {
     if (application && appExtendedSettings) {
-      for (const setting of appExtendedSettings) {
-        const {key} = setting;
+      for (let s = 0; s < appExtendedSettings.length; s += 1) {
+        const setting = appExtendedSettings[s];
+        const { key } = setting;
         const value = readOptionsValue(opts, setting.optionsField);
         const storageValue = getLocalStorageValue(key);
         storageValue[application.id] = value;
@@ -53,7 +55,7 @@ export default function useAppExtendedSettings (application) {
   }, [application, appExtendedSettings]);
   const onChange = useCallback((setting, value, saveLocal = false) => {
     if (setting && options) {
-      const newOptions = {...appendOptionsValue(options, setting.optionsField, value)};
+      const newOptions = { ...appendOptionsValue(options, setting.optionsField, value) };
       setOptions(newOptions);
       if (saveLocal) {
         save(newOptions);
@@ -67,8 +69,9 @@ export default function useAppExtendedSettings (application) {
     return undefined;
   }, [options, readOptionsValue()]);
   const appendDefault = useCallback((opts) => {
-    const result = {...opts};
-    for (const setting of appExtendedSettings) {
+    const result = { ...opts };
+    for (let s = 0; s < appExtendedSettings.length; s += 1) {
+      const setting = appExtendedSettings[s];
       if (setting.default && readOptionsValue(result, setting.optionsField) === undefined) {
         appendOptionsValue(result, setting.optionsField, setting.default);
       }
@@ -80,6 +83,6 @@ export default function useAppExtendedSettings (application) {
     getSettingValue,
     onChange,
     options,
-    save
-  }
+    save,
+  };
 }

@@ -3,8 +3,8 @@ import apiGet from '../base/api-get';
 export default function getNodes() {
   return new Promise((resolve, reject) => {
     apiGet('cluster/node/loadAll')
-      .then(response => {
-        const {status, message, payload: nodes = []} = response;
+      .then((response) => {
+        const { status, message, payload: nodes = [] } = response;
         if (status === 'OK') {
           resolve(nodes);
         } else {

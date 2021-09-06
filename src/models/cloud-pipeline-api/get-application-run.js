@@ -1,15 +1,19 @@
 import getUserRuns from './get-user-runs';
 
-const runHasParameterWithValue = (parameter, valueRegExp) => run => (run.pipelineRunParameters || [])
-  .find(p => p.name === parameter && valueRegExp.test(`${p.value}`));
+function runHasParameterWithValue(parameter, valueRegExp) {
+  return function filterRun(run) {
+    return (run.pipelineRunParameters || [])
+      .find((p) => p.name === parameter && valueRegExp.test(`${p.value}`));
+  };
+}
 
 export default function getApplicationRun(
-    application,
-    user,
-    dockerImage,
-    storageUser = undefined,
-    prettyUrl,
-    parametersToCheck = {}
+  application,
+  user,
+  dockerImage,
+  storageUser = undefined,
+  prettyUrl,
+  parametersToCheck = {},
 ) {
   const dockerImageRegExp = dockerImage ? new RegExp(`^${dockerImage}$`, 'i') : /.*/;
   const storageUserRegExp = storageUser ? new RegExp(`^${storageUser}$`, 'i') : undefined;
@@ -32,7 +36,11 @@ export default function getApplicationRun(
     if (prettyUrl) {
       searchCriteriaDescriptions.push(`RUN_PRETTY_URL parameter is "${prettyUrlCorrected}"`);
     }
-    if (parametersToCheck && !!Object.values(parametersToCheck || {}).find(o => o !== undefined)) {
+    if (
+      parametersToCheck
+      && !!Object.values(parametersToCheck || {})
+        .find((o) => o !== undefined)
+    ) {
       const conditions = [];
       Object.entries(parametersToCheck || {})
         .forEach(([key, value]) => {
@@ -40,34 +48,33 @@ export default function getApplicationRun(
           const regExp = new RegExp(`^${value}$`, 'i');
           conditions.push(runHasParameterWithValue(key, regExp));
         });
-      parametersCheck = run => conditions
-        .map(condition => condition(run))
-        .filter(conditionPassed => !conditionPassed)
+      parametersCheck = (run) => conditions
+        .map((condition) => condition(run))
+        .filter((conditionPassed) => !conditionPassed)
         .length === 0;
     }
     console.log(`Searching user (${user}) jobs with following conditions:`);
-    searchCriteriaDescriptions.forEach(condition => console.log(condition));
+    searchCriteriaDescriptions.forEach((condition) => console.log(condition));
     getUserRuns(user)
-      .then(runs => {
+      .then((runs) => {
         const userRuns = runs
-          .filter(run => dockerImageRegExp.test(run.dockerImage)
+          .filter((run) => dockerImageRegExp.test(run.dockerImage)
             && (run.pipelineRunParameters || [])
-              .filter(p => p.name === 'APPLICATION' && `${p.value}` === `${application}`)
+              .filter((p) => p.name === 'APPLICATION' && `${p.value}` === `${application}`)
               .length > 0
             && (
-              !storageUserRegExp ||
-              (run.pipelineRunParameters || [])
-                .filter(p => p.name === 'DEFAULT_STORAGE_USER' && storageUserRegExp.test(`${p.value}`))
+              !storageUserRegExp
+              || (run.pipelineRunParameters || [])
+                .filter((p) => p.name === 'DEFAULT_STORAGE_USER' && storageUserRegExp.test(`${p.value}`))
                 .length > 0
             )
             && (
-                !prettyUrlRegExp ||
-                (run.pipelineRunParameters || [])
-                  .filter(p => p.name === 'RUN_PRETTY_URL' && prettyUrlRegExp.test(`${p.value}`))
+              !prettyUrlRegExp
+                || (run.pipelineRunParameters || [])
+                  .filter((p) => p.name === 'RUN_PRETTY_URL' && prettyUrlRegExp.test(`${p.value}`))
                   .length > 0
             )
-            && parametersCheck(run)
-          )
+            && parametersCheck(run));
         resolve(userRuns);
       })
       .catch(reject);

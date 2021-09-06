@@ -1,4 +1,4 @@
-import combineUrl from "./combine-url";
+import combineUrl from './combine-url';
 
 function getSettings() {
   return new Promise((resolve, reject) => {
@@ -8,11 +8,11 @@ function getSettings() {
         {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+            'Content-Type': 'application/json',
+          },
+        },
       )
-        .then(response => {
+        .then((response) => {
           const codeFamily = Math.ceil(response.status / 100);
           if (codeFamily === 4 || codeFamily === 5) {
             reject(new Error(`Response: ${response.status} ${response.statusText}`));
@@ -47,8 +47,8 @@ const defaultUrlParser = {
     redirectPathName: '[group2]/[group3][group4]',
     user: '[group2]',
     version: 'latest',
-    rest: '[group4]'
-  }
+    rest: '[group4]',
+  },
 };
 
 const defaultSettings = {
@@ -75,36 +75,36 @@ const defaultSettings = {
   urlParser: [defaultUrlParser],
   parameters: {},
   useBearerAuth: true,
-  redirectBehavior: 'endpoint',// ['endpoint', 'custom']
+  redirectBehavior: 'endpoint', // ['endpoint', 'custom']
   redirectUrl: undefined,
   shareWithUsers: undefined,
   shareWithGroups: undefined,
   redirectOnAPIUnauthenticated: false,
   checkRunPrettyUrl: true,
   redirectAfterTaskFinished: undefined,
-  appConfigStorage: 1880,//'user_default_storage',
+  appConfigStorage: 1880, // 'user_default_storage',
   appConfigPath: '/[user]/ShinyApps/[version]/[app]/gateway.spec',
   folderApplicationIgnoredPaths: [],
   folderApplicationUserPlaceholder: 'user', // to determine which placeholder is used for user name substitution
   folderApplicationAppPlaceholder: 'app', // to determine which placeholder is used for application name substitution
   folderApplicationPathAttributes: {
     version: 'RVersion',
-    app: 'name'
+    app: 'name',
   },
   appConfigNodeSizes: {
     normal: 'm5.xlarge',
     medium: 'm5.2xlarge',
-    large: 'm5.4xlarge'
+    large: 'm5.4xlarge',
   },
   sessionInfoStorage: undefined,
   sessionInfoPath: undefined,
   userStoragesAttribute: undefined,
-  applicationsMode: 'folder', //one of "docker", "folder",
-  serviceUser: "PIPE_ADMIN",
+  applicationsMode: 'folder', // one of "docker", "folder",
+  serviceUser: 'PIPE_ADMIN',
   folderApplicationLaunchLinkFormat: '/[user]/[version]/[app]',
   folderApplicationAdvancedUserRoleName: ['ROLE_ADVANCED_USER'],
   folderApplicationsListStorage: undefined,
-  folderApplicationsListFile: undefined,//'/[user]/ShinyApps/applications.spec',
+  folderApplicationsListFile: undefined, // '/[user]/ShinyApps/applications.spec',
   folderApplicationRequiredFields: ['description', 'fullDescription', 'icon'],
   help: undefined,
   folderApplicationValidation: {
@@ -112,10 +112,10 @@ const defaultSettings = {
     applicationPath: '/cloud-data/[application_storage_path]/[application_path]',
     expiresAfter: '130m',
     parameters: {
-      CP_CAP_SHINY_VALIDATOR_MODE: true
+      CP_CAP_SHINY_VALIDATOR_MODE: true,
     },
-    pollingIntervalMS: 2500
-  }
+    pollingIntervalMS: 2500,
+  },
 };
 
 function parseUrl(url, verbose = false) {
@@ -125,7 +125,7 @@ function parseUrl(url, verbose = false) {
     console.log('Configurations:', JSON.stringify(this.urlParser || []));
   }
   const [config] = (this.urlParser || [])
-    .filter(c => (new RegExp(c.test || c.format || '', 'i')).test(url));
+    .filter((c) => (new RegExp(c.test || c.format || '', 'i')).test(url));
   if (config && url) {
     if (verbose) {
       console.log(`${config.name || config.format} configuration will be used for url ${url}`, config);
@@ -134,25 +134,25 @@ function parseUrl(url, verbose = false) {
     const groups = [];
     const exec = reg.exec(url);
     if (exec && exec.length) {
-      for (let i = 1; i < exec.length; i++) {
+      for (let i = 1; i < exec.length; i += 1) {
         groups.push({
           value: exec[i] || '',
           reg: new RegExp(`\\[GROUP${i}\\]`, 'ig'),
-          process: function (o) {
+          process(o) {
             return o.replace(this.reg, this.value);
-          }
+          },
         });
       }
     }
     groups.push({
       value: '',
       reg: /\[group[\d]+\]/ig,
-      process: function (o) {
+      process(o) {
         return o.replace(this.reg, this.value);
-      }
-    })
+      },
+    });
     const keys = Object.keys(config.map || {});
-    for (let k = 0; k < keys.length; k++) {
+    for (let k = 0; k < keys.length; k += 1) {
       const key = keys[k];
       const value = config.map[key];
       if (typeof value === 'string') {
@@ -169,16 +169,16 @@ function parseUrl(url, verbose = false) {
 
 defaultSettings.parseUrl = parseUrl.bind(defaultSettings);
 
-function mergeSettings (...o) {
+function mergeSettings(...o) {
   if (o.length === 0) {
     return {};
   }
-  const result = Object.assign({}, o[0]);
-  for (let i = 1; i < o.length; i++) {
+  const result = { ...o[0] };
+  for (let i = 1; i < o.length; i += 1) {
     const s = o[i];
     const keys = Object.keys(s);
-    for (let k = 0; k < keys.length; k++) {
-      if (s.hasOwnProperty(keys[k]) && s[keys[k]] !== undefined) {
+    for (let k = 0; k < keys.length; k += 1) {
+      if (Object.prototype.hasOwnProperty.call(s, keys[k]) && s[keys[k]] !== undefined) {
         result[keys[k]] = s[keys[k]];
       }
     }
@@ -186,34 +186,34 @@ function mergeSettings (...o) {
   return result;
 }
 
-function safeMergeSettings (...o) {
+function safeMergeSettings(...o) {
   return mergeSettings(...o.filter(Boolean));
 }
 
 const cookies = (document.cookie || '')
   .split(';')
-  .map(o => o.trim())
-  .map(o => {
+  .map((o) => o.trim())
+  .map((o) => {
     const [key, value] = o.split('=');
-    return {key, value};
+    return { key, value };
   });
 
-const [tokenCookie] = cookies.filter(c => /^bearer$/i.test(c.key));
+const [tokenCookie] = cookies.filter((c) => /^bearer$/i.test(c.key));
 const token = tokenCookie ? tokenCookie.value : undefined;
 
-const AUTH_HEADERS = Object.assign(
-  {},
-  token
-    ? {'Authorization': `Bearer ${token}`}
-    : {}
-);
+const AUTH_HEADERS = {
 
-function whoAmIRawCall (settings) {
+  ...(token
+    ? { Authorization: `Bearer ${token}` }
+    : {}),
+};
+
+function whoAmIRawCall(appSettings) {
   return new Promise((resolve, reject) => {
-    const extraHeaders = settings.useBearerAuth ? AUTH_HEADERS : {};
+    const extraHeaders = appSettings.useBearerAuth ? AUTH_HEADERS : {};
     try {
       fetch(
-        combineUrl(settings.api, `/whoami`),
+        combineUrl(appSettings.api, '/whoami'),
         {
           mode: CPAPI ? 'cors' : undefined,
           credentials: CPAPI ? 'include' : undefined,
@@ -221,11 +221,11 @@ function whoAmIRawCall (settings) {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...extraHeaders
-          }
-        }
+            ...extraHeaders,
+          },
+        },
       )
-        .then(response => {
+        .then((response) => {
           const codeFamily = Math.ceil(response.status / 100);
           if (codeFamily === 4 || codeFamily === 5) {
             reject(new Error(`Response: ${response.status} ${response.statusText}`));
@@ -247,15 +247,17 @@ function extendUrlMapWithOwner(maps, owner) {
   if (!owner) {
     return;
   }
-  maps.forEach(map => {
+  maps.forEach((map) => {
     if (map.map) {
-      if (!map.map.hasOwnProperty('owner')) {
+      if (!Object.prototype.hasOwnProperty.call(map.map, 'owner')) {
+        // eslint-disable-next-line no-param-reassign
         map.map.owner = owner.userName;
         console.log(map.name || map.format, `map was extended with "owner"="${owner.userName}" property`);
       } else {
         console.log(map.name || map.format, 'map already has "owner" property');
       }
-      if (!map.map.hasOwnProperty('owner_id')) {
+      if (!Object.prototype.hasOwnProperty.call(map.map, 'owner_id')) {
+        // eslint-disable-next-line no-param-reassign
         map.map.owner_id = `${owner.id}`;
         console.log(map.name || map.format, `map was extended with "owner_id"="${owner.id}" property`);
       } else {
@@ -274,13 +276,14 @@ export default function fetchSettings() {
   }
   settingsPromise = new Promise((resolve) => {
     getSettings()
-      .then(result => {
+      .then((result) => {
         console.log('Settings response:', JSON.stringify(result));
         settings = safeMergeSettings(
           {},
           defaultSettings,
-          (result || {})[document.location.hostname]);
-        settings.tagValueRegExp = new RegExp(`^${settings.tagValue}$`, 'i')
+          (result || {})[document.location.hostname],
+        );
+        settings.tagValueRegExp = new RegExp(`^${settings.tagValue}$`, 'i');
         settings.parseUrl = parseUrl.bind(settings);
         if ((settings.urlParser || []).indexOf(defaultUrlParser) === -1) {
           if (Array.isArray(settings.urlParser)) {
@@ -288,7 +291,7 @@ export default function fetchSettings() {
           }
         }
         whoAmIRawCall(settings)
-          .then(ownerInfo => {
+          .then((ownerInfo) => {
             extendUrlMapWithOwner(settings.urlParser || [], ownerInfo?.payload);
           })
           .catch((e) => {
@@ -305,11 +308,11 @@ export default function fetchSettings() {
         settings = mergeSettings(defaultSettings);
         settings.parseUrl = parseUrl.bind(settings);
         whoAmIRawCall(settings)
-          .then(ownerInfo => {
+          .then((ownerInfo) => {
             extendUrlMapWithOwner(settings.urlParser || [], ownerInfo?.payload);
           })
-          .catch((e) => {
-            console.log('Error fetching user info:', e.message);
+          .catch((error) => {
+            console.log('Error fetching user info:', error.message);
           })
           .then(() => {
             console.log('The following settings will be used (env vars):', settings);

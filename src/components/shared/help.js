@@ -1,13 +1,14 @@
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {useSettings} from '../use-settings';
+import { useSettings } from '../use-settings';
 import './help.css';
-import Markdown from "./markdown";
+import Markdown from './markdown';
 
-export default function Help (
+function Help(
   {
-    className
-  }
+    className,
+  },
 ) {
   const [visible, setVisible] = useState(false);
   const show = useCallback(() => setVisible(true), [setVisible]);
@@ -20,12 +21,15 @@ export default function Help (
           classNames(
             'help-button-container',
             className,
-            {visible}
+            { visible },
           )
         }
       >
         <div
-          className={'help-button'}
+          role="button"
+          tabIndex={0}
+          onKeyPress={show}
+          className="help-button"
           onClick={show}
         >
           ?
@@ -33,6 +37,9 @@ export default function Help (
         <div
           className="overlay"
           onClick={hide}
+          role="button"
+          tabIndex={0}
+          onKeyPress={hide}
         >
           {'\u00A0'}
         </div>
@@ -45,3 +52,13 @@ export default function Help (
   }
   return null;
 }
+
+Help.propTypes = {
+  className: PropTypes.string,
+};
+
+Help.defaultProps = {
+  className: undefined,
+};
+
+export default Help;

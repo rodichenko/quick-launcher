@@ -3,5 +3,5 @@ const isProductionMode = !isDevelopmentMode;
 
 module.exports = {
   isDevelopmentMode,
-  isProductionMode
+  isProductionMode,
 };

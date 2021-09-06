@@ -3,10 +3,12 @@
 ## Client build instructions
 ### Prerequisites
 * Nodejs (v15) & npm (v7)
+
 * The following assets should be copied to the **assets** directory:
   * **background.png** - application background;
   * **favicon.png** - application icon;
   * **logo.png** - application logo;
+
 * Optionally set the following env vars:
   * `CP_APPLICATIONS_TITLE` - application title; if not presented, "*Applications*" title will be used;
   * `CP_APPLICATIONS_API` - API endpoint (see below); if not presented, `/restapi` will be used;
@@ -31,12 +33,19 @@ Build assets will be placed to the **build** directory.
 ## Usage of Cloud Pipeline API
 If `USE_CLOUD_PIPELINE_API` is set, application will use Cloud Pipeline' detached configurations with `TYPE`=`APPLICATION` as "Applications". The following API methods will be used:
 * GET `/whoami` - for fetching user's info;
+
 * GET `/configuration/loadAll` - for fetching the list of all available detached configurations;
+
 * POST `/metadata/load` - for fetching configuration attributes;
+
 * GET `/dockerRegistry/loadTree` - for fetching tools;
+
 * GET `/tool/<TOOL_IDENTIFIER>/icon` - for fetching tool icon;
+
 * POST `/runConfiguration` - for launching the detached configuration;
+
 * GET `/run/<RUN_ID>` - for fetching run info;
+
 * POST `/run/<RUN_ID>/status` - for stopping the run.
 
 **Authentication**
@@ -91,6 +100,7 @@ where
   * **icon** string, absolute url - application icon url; this url must be absolute (e.g. `https://applications.server.com/api/icon/rstudio.3.6` or `/api/icon/rstudio.3.6`);
   * **background** string, absolute url - application background image url (will be displayed on hover); this url must be absolute (e.g. `https://applications.server.com/api/background/rstudio.3.6` or `/api/background/rstudio.3.6`);
   * **backgroundStyle** json - additional background image properties (css properties in camelCase, i.e. `backgroundSize: cover;` )
+
 * **userInfo** required:
   * **userName** string, required.
 
@@ -109,4 +119,5 @@ Response example:
 ```
 where:
 * **status** string, required - `pending` / `ready`;
+
 * **url** string, required when status is `ready` - application's url to redirect.

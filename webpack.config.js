@@ -15,21 +15,19 @@ if (!publicPath.endsWith('/')) {
 const publicUrl = publicPath.substr(0, publicPath.length - 1);
 const cpApplicationsAPI = env.CP_APPLICATIONS_API;
 const isCPAPI = ['1', 'true', 'undefined'].indexOf(`${env.USE_CLOUD_PIPELINE_API}`) >= 0;
-console.log(isCPAPI);
 const darkMode = ['1', 'true'].indexOf(`${env.DARK_MODE}`) >= 0;
 const pollingInterval = env.POLLING_INTERVAL || 3000;
 const initialPollingDelay = env.INITIAL_POLLING_DELAY || 5000;
 const limitMounts = env.LIMIT_MOUNTS || 'default';
-
-console.log(env);
+const background = env.BACKGROUND || 'assets/background.png';
 
 const globalVariables = {
   'PUBLIC_URL': publicUrl,
   'CP_APPLICATIONS_API': cpApplicationsAPI,
   'CP_APPLICATIONS_TITLE': env.CP_APPLICATIONS_TITLE || 'Applications',
   'CP_APPLICATIONS_FAVICON': env.FAVICON,
-  'CP_APPLICATIONS_BACKGROUND': env.BACKGROUND
-    ? ((publicUrl || '') + '/' + env.BACKGROUND).replace('//', '/')
+  'CP_APPLICATIONS_BACKGROUND': background
+    ? ((publicUrl || '') + '/' + background).replace('//', '/')
     : undefined,
   'CP_APPLICATIONS_LOGO': env.LOGO
     ? ((publicUrl || '') + '/' + env.LOGO).replace('//', '/')

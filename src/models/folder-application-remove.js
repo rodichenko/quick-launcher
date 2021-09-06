@@ -1,8 +1,8 @@
 import removeDataStorageItem from './cloud-pipeline-api/data-storage-item-remove';
 import fetchFolderApplications from './fetch-folder-applications';
-import {safelyRemoveApplication} from './folder-applications-list';
+import { safelyRemoveApplication } from './folder-applications-list';
 
-export default function folderApplicationRemove (application, settings, callback) {
+export default function folderApplicationRemove(application, settings, callback) {
   if (!application || !application.info) {
     return Promise.reject(new Error('Application is not defined'));
   }
@@ -11,7 +11,7 @@ export default function folderApplicationRemove (application, settings, callback
   }
   const {
     published,
-    info = {}
+    info = {},
   } = application;
   if (!published) {
     return Promise.reject(new Error('Application is not published'));
@@ -25,20 +25,26 @@ export default function folderApplicationRemove (application, settings, callback
   }
   console.log('Removing folder application', application.name, 'from', source);
   return new Promise((resolve, reject) => {
-    callback && callback('Removing application files...', 0.1);
+    if (callback) {
+      callback('Removing application files...', 0.1);
+    }
     removeDataStorageItem(application.storage, source)
       .then(() => {
-        callback && callback('Updating metadata file...', 0.5);
-        return safelyRemoveApplication(settings, settings.serviceUser, application)
+        if (callback) {
+          callback('Updating metadata file...', 0.5);
+        }
+        return safelyRemoveApplication(settings, settings.serviceUser, application);
       })
       .then(() => {
-        const options = settings.parseUrl(window.location.href)
-        callback && callback('Finishing', 0.95);
+        const options = settings.parseUrl(window.location.href);
+        if (callback) {
+          callback('Finishing', 0.95);
+        }
         return fetchFolderApplications(
           settings,
           options,
-          {userName: settings.serviceUser},
-          true
+          { userName: settings.serviceUser },
+          true,
         );
       })
       .then(resolve)

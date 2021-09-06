@@ -1,30 +1,30 @@
 import React from 'react';
 import App from './app';
-import {useSettings} from './components/use-settings';
+import { useSettings } from './components/use-settings';
 import FolderApp from './folder-app';
 import LoadingIndicator from './components/shared/loading-indicator';
 import './mode-selector.css';
 
-function ModeSelector (props) {
+function ModeSelector(props) {
   const settings = useSettings();
-  const {launch} = props || {};
+  const { launch, location } = props || {};
   if (!settings) {
     return (
       <div className="centered">
         <div className="loading">
-          <LoadingIndicator/>
+          <LoadingIndicator />
           <span>Loading...</span>
         </div>
       </div>
     );
   }
-  const {applicationsMode} = settings;
+  const { applicationsMode } = settings;
   if (!launch && /^folder$/i.test(applicationsMode)) {
     return (
-      <FolderApp {...props} />
+      <FolderApp location={location} />
     );
   }
-  return (<App {...props} />);
+  return (<App launch={launch} location={location} />);
 }
 
 export default ModeSelector;

@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import getApplications from '../models/applications';
 
 const ApplicationsContext = React.createContext([]);
 const UserContext = React.createContext(undefined);
 
-export {ApplicationsContext, UserContext};
-export function useApplications () {
+export { ApplicationsContext, UserContext };
+export function useApplications() {
   const [pending, setPending] = useState(true);
   const [apps, setApps] = useState([]);
   const [user, setUser] = useState(undefined);
@@ -27,7 +27,7 @@ export function useApplications () {
           setError(undefined);
         }
       })
-      .catch(e => {
+      .catch((e) => {
         setPending(false);
         setError(e.message);
       });
@@ -36,6 +36,6 @@ export function useApplications () {
     applications: apps,
     pending,
     error,
-    user
+    user,
   };
 }

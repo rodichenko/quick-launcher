@@ -4,7 +4,7 @@ export default function copyDataStorageItem(
   storage,
   path,
   newPath,
-  move = false
+  move = false,
 ) {
   if (!path || !newPath) {
     return Promise.resolve();
@@ -15,7 +15,7 @@ export default function copyDataStorageItem(
       action: move ? 'Move' : 'Copy',
       oldPath: path,
       path: newPath,
-      type: path.endsWith('/') ? 'Folder' : 'File'
-    }]
+      type: path.endsWith('/') ? 'Folder' : 'File',
+    }],
   );
 }

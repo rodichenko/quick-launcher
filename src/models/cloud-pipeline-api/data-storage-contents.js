@@ -1,8 +1,8 @@
 import getDataStorageItems from './data-storage-list';
 
-export default function getDataStorageContents (
+export default function getDataStorageContents(
   storage,
-  path
+  path,
 ) {
   const processMarker = (marker, initial = true) => {
     if (!marker && !initial) {
@@ -10,19 +10,19 @@ export default function getDataStorageContents (
     }
     return new Promise((resolve) => {
       getDataStorageItems(storage, path, marker)
-        .then(result => {
-          const {results = [], nextPageMarker} = result || {};
+        .then((result) => {
+          const { results = [], nextPageMarker } = result || {};
           return Promise.all([
             Promise.resolve(results),
-            processMarker(nextPageMarker, false)
+            processMarker(nextPageMarker, false),
           ]);
         })
-        .then(payloads => resolve(payloads.reduce((r, c) => ([...r, ...c]), [])))
-        .catch(e => {
+        .then((payloads) => resolve(payloads.reduce((r, c) => ([...r, ...c]), [])))
+        .catch((e) => {
           console.warn(e.message);
           resolve([]);
         });
     });
-  }
+  };
   return processMarker();
 }

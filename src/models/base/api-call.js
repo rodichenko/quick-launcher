@@ -1,7 +1,7 @@
 import combineUrl from './combine-url';
 import getSettings from './settings';
 
-function removeTrailingSlash (url) {
+function removeTrailingSlash(url) {
   if (!url || !url.endsWith('/')) {
     return url;
   }
@@ -10,32 +10,32 @@ function removeTrailingSlash (url) {
 
 const cookies = (document.cookie || '')
   .split(';')
-  .map(o => o.trim())
-  .map(o => {
+  .map((o) => o.trim())
+  .map((o) => {
     const [key, value] = o.split('=');
-    return {key, value};
+    return { key, value };
   });
 
-const [tokenCookie] = cookies.filter(c => /^bearer$/i.test(c.key));
+const [tokenCookie] = cookies.filter((c) => /^bearer$/i.test(c.key));
 const token = tokenCookie ? tokenCookie.value : undefined;
 
-const AUTH_HEADERS = Object.assign(
-  {},
-  token
-    ? {'Authorization': `Bearer ${token}`}
-    : {}
-  );
+const AUTH_HEADERS = {
 
-export {combineUrl};
-export default function apiCall (uri, query = {}, method = 'GET', body = undefined, options = {}) {
+  ...(token
+    ? { Authorization: `Bearer ${token}` }
+    : {}),
+};
+
+export { combineUrl };
+export default function apiCall(uri, query = {}, method = 'GET', body = undefined, options = {}) {
   return new Promise((resolve, reject) => {
     getSettings()
-      .then(settings => {
+      .then((settings) => {
         const {
           absoluteUrl = false,
           headers = {},
           isBlob = false,
-          credentials = true
+          credentials = true,
         } = options;
         const extraHeaders = settings.useBearerAuth ? AUTH_HEADERS : {};
         try {
@@ -55,34 +55,32 @@ export default function apiCall (uri, query = {}, method = 'GET', body = undefin
               headers: {
                 'Content-Type': 'application/json',
                 ...headers,
-                ...extraHeaders
-              }
-            }
+                ...extraHeaders,
+              },
+            },
           )
-            .then(response => {
+            .then((response) => {
               const codeFamily = Math.ceil(response.status / 100);
               if (codeFamily === 4 || codeFamily === 5) {
                 if (response.status === 401 && settings.redirectOnAPIUnauthenticated) {
                   const authEndpoint = combineUrl(
                     settings.api,
-                    `/route?url=${removeTrailingSlash(document.location.href)}/&type=COOKIE`
+                    `/route?url=${removeTrailingSlash(document.location.href)}/&type=COOKIE`,
                   );
                   console.log(`"${uri}" got 401 error. Redirecting to ${authEndpoint}`);
                   window.location = authEndpoint;
                 }
                 reject(new Error(`Response: ${response.status} ${response.statusText}`));
+              } else if (isBlob) {
+                response
+                  .blob()
+                  .then(resolve)
+                  .catch(reject);
               } else {
-                if (isBlob) {
-                  response
-                    .blob()
-                    .then(resolve)
-                    .catch(reject);
-                } else {
-                  response
-                    .json()
-                    .then(resolve)
-                    .catch(reject);
-                }
+                response
+                  .json()
+                  .then(resolve)
+                  .catch(reject);
               }
             })
             .catch(reject);

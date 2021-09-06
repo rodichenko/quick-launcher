@@ -5,34 +5,6 @@
   line-height: 18pt;
 }
 
-.content.loading {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.content.error {
-  margin-top: 5px;
-  max-width: calc(100vw - 360px);
-}
-
-.content.error .header {
-  font-size: 16pt;
-  color: #fff;
-}
-
-.content.error .description {
-  font-size: 10pt;
-  color: #aaa;
-}
-
-.content.error .description .raw {
-  font-family: monospace;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 5px;
-  line-height: 18pt;
-}
-
 .apps {
   width: calc(100vw - 360px);
   display: flex;
@@ -88,13 +60,63 @@
 }
 
 .app .header,
-.app-launch-form .header{
+.app-launch-form .header {
   font-size: 24pt;
   height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 10px 0;
+}
+
+.content.loading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.app .description {
+  font-size: 10pt;
+  color: #aaa;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex: 1;
+}
+
+.app-info .header {
+  font-size: 24pt;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  line-height: 60px;
+}
+
+.app-info .header .icon {
+  height: 60px;
+  margin-right: 5px;
+}
+
+.content.error {
+  margin-top: 5px;
+  max-width: calc(100vw - 360px);
+}
+
+.content.error .header {
+  font-size: 16pt;
+  color: #fff;
+}
+
+.content.error .description {
+  font-size: 10pt;
+  color: #aaa;
+}
+
+.content.error .description .raw {
+  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 5px;
+  line-height: 18pt;
 }
 
 .app .header .name,
@@ -107,9 +129,6 @@
 
 .app.app-folder {
   padding: 10px;
-}
-
-.app.app-folder {
   min-height: 100px;
   height: unset;
 }
@@ -147,6 +166,10 @@
   overflow: auto;
 }
 
+.app:hover .header .name {
+  color: #fff;
+}
+
 .app.app-folder .layout .layout-column .header {
   margin: 0;
 }
@@ -173,10 +196,6 @@
 
 .app.dark:hover {
   background-color: rgba(0, 0, 0, 0.75);
-}
-
-.app:hover .header .name {
-  color: #fff;
 }
 
 .app .app-description,
@@ -209,14 +228,6 @@
   margin-right: 5px;
 }
 
-.app .description {
-  font-size: 10pt;
-  color: #aaa;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  flex: 1;
-}
-
 .app-info {
   position: relative;
   max-width: calc(100vw - 360px);
@@ -239,19 +250,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.app-settings .gear-container .gear > svg{
-  fill: #999;
-}
-
-.app-settings .gear-container .gear:hover {
-  color: #ccc;
-  text-decoration: underline;
-}
-
-.app-settings .gear-container .gear:hover > svg {
-  fill: #ccc;
 }
 
 .app-settings .gear-container .overlay {
@@ -303,24 +301,6 @@
 
 .app-settings .gear-container .popup.visible {
   display: block;
-}
-
-.app-info .header {
-  font-size: 24pt;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  line-height: 60px;
-}
-
-.app-info .header .icon {
-  height: 60px;
-  margin-right: 5px;
-}
-
-.app-info .header .name {
-
 }
 
 .app-info .header .version {
@@ -429,15 +409,25 @@
   margin-bottom: 5px;
 }
 
+.app-launch-form .setting-value.radio .value.selected,
+.app-settings .setting-value.radio .value.selected,
+.app-launch-form .setting-value.radio .value.selected:hover,
+.app-settings .setting-value.radio .value.selected:hover {
+  background-color: rgba(255, 255, 255, 0.75);
+  color: #333;
+}
+
+.app-settings .setting-value.radio .value {
+  color: #eee;
+  line-height: unset;
+  cursor: pointer;
+  padding-left: 10px;
+  margin-bottom: 1px;
+}
+
 .app-launch-form .setting-value.radio .value:hover {
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
-}
-
-.app-launch-form .setting-value.radio .value.selected,
-.app-launch-form .setting-value.radio .value.selected:hover {
-  background-color: rgba(255, 255, 255, 0.75);
-  color: #333;
 }
 
 .extended-setting-presentation {
@@ -455,22 +445,8 @@
   display: none;
 }
 
-.app-settings .setting-value.radio .value {
-  color: #eee;
-  line-height: unset;
-  cursor: pointer;
-  padding-left: 10px;
-  margin-bottom: 1px;
-}
-
 .app-settings .setting-value.radio .value:hover {
   background-color: rgba(255, 255, 255, 0.05);
-}
-
-.app-settings .setting-value.radio .value.selected,
-.app-settings .setting-value.radio .value.selected:hover {
-  background-color: rgba(255, 255, 255, 0.75);
-  color: #333;
 }
 
 .content.stop-run {
@@ -540,7 +516,7 @@
   top: 5px;
   right: 5px;
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
 }
 
@@ -551,10 +527,6 @@
 
 .app-folder .folder-app-actions-container .folder-app-action:hover {
   color: #ddd;
-}
-
-.app-folder .folder-app-actions-container .folder-app-action svg {
-  stroke: currentColor;
 }
 
 .app-folder .folder-app-gear {
@@ -573,6 +545,10 @@
   fill: rgba(255, 255, 255, 0.15);
 }
 
+.app-folder .folder-app-actions-container .folder-app-action svg {
+  stroke: currentColor;
+}
+
 .app-folder .folder-app-star:hover {
   color: #ccc;
 }
@@ -589,6 +565,19 @@
   fill: rgba(255, 162, 0, 0.5);
 }
 
+.app-settings .gear-container .gear > svg {
+  fill: #999;
+}
+
 .app-folder .folder-app-star.favourite:hover > svg {
   fill: rgba(255, 162, 0, 0.75);
+}
+
+.app-settings .gear-container .gear:hover {
+  color: #ccc;
+  text-decoration: underline;
+}
+
+.app-settings .gear-container .gear:hover > svg {
+  fill: #ccc;
 }

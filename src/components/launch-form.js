@@ -1,81 +1,16 @@
-import React, {useCallback, useContext, useState} from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { useCallback, useContext } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './components.css';
-import {ExtendedSettingsContext} from "./utilities/use-extended-settings";
+import { ExtendedSettingsContext } from './utilities/use-extended-settings';
 import useAppExtendedSettings from './utilities/use-app-extended-settings';
+import SettingValue from './setting-value';
 
-function Selection(
-  {
-    config,
-    value,
-    onChange = (() => {})
-  }
-) {
-  if (!config) {
-    return null;
-  }
-  const {
-    values = [],
-    itemValue = (o => o),
-    itemName = (o => o)
-  } = config;
-  if (!values.length) {
-    return null;
-  }
-  const handleClick = item => e => {
-    e && e.preventDefault();
-    e && e.stopPropagation();
-    const isSelected = itemValue(item) === value;
-    if (isSelected && !config.required) {
-      onChange && onChange(undefined);
-    } else {
-      onChange && onChange(itemValue(item));
-    }
-  };
-  return (
-    <>
-      {
-        values.map(item => (
-          <div
-            key={itemValue(item)}
-            className={
-              classNames(
-                'value',
-                {
-                  selected: itemValue(item) === value
-                }
-              )
-            }
-            onClick={handleClick(item)}
-          >
-            {itemName(item)}
-          </div>
-        ))
-      }
-    </>
-  );
-}
-
-function SettingValue({config, value, onChange}) {
-  if (!config) {
-    return null;
-  }
-  if (/^radio$/i.test(config.type)) {
-    return (
-      <Selection
-        config={config}
-        value={value}
-        onChange={onChange}
-      />
-    );
-  }
-  return null;
-}
-
-export default function LaunchForm(
+function LaunchForm(
   {
     application,
-    onLaunch
+    onLaunch,
   },
 ) {
   const appExtendedSettings = useContext(ExtendedSettingsContext);
@@ -84,14 +19,16 @@ export default function LaunchForm(
     getSettingValue,
     onChange,
     options,
-    save
+    save,
   } = useAppExtendedSettings(application);
   const onLaunchClicked = useCallback(() => {
     save(options);
-    onLaunch && onLaunch(appendDefault(options));
+    if (onLaunch) {
+      onLaunch(appendDefault(options));
+    }
   }, [options, save, onLaunch, appendDefault]);
   return (
-    <div className={classNames('app-launch-form', {dark: DARK_MODE})}>
+    <div className={classNames('app-launch-form', { dark: DARK_MODE })}>
       <div className="header">
         {
           application.icon && (
@@ -122,8 +59,11 @@ export default function LaunchForm(
           )
         }
         <div
+          tabIndex={0}
+          role="button"
           className={classNames('launch', 'button')}
           onClick={onLaunchClicked}
+          onKeyPress={onLaunchClicked}
         >
           LAUNCH
         </div>
@@ -131,6 +71,7 @@ export default function LaunchForm(
       <div className="divider">{'\u00A0'}</div>
       {
         appExtendedSettings.map((setting, index) => [
+          // eslint-disable-next-line react/no-array-index-key
           <div key={`${setting.key}-${index}`} className="setting">
             <div className="setting-title">
               {setting.title}
@@ -139,13 +80,13 @@ export default function LaunchForm(
               className={
                 classNames(
                   'setting-value',
-                  setting?.type
+                  setting?.type,
                 )
               }
             >
               <SettingValue
                 config={setting}
-                onChange={value => onChange(setting, value)}
+                onChange={(value) => onChange(setting, value)}
                 value={getSettingValue(setting)}
               />
             </div>
@@ -155,9 +96,22 @@ export default function LaunchForm(
             className="setting-divider"
           >
             {'\u00A0'}
-          </div>
+          </div>,
         ]).reduce((r, c) => ([...r, ...c]), [])
       }
     </div>
   );
 }
+
+LaunchForm.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  application: PropTypes.object,
+  onLaunch: PropTypes.func,
+};
+
+LaunchForm.defaultProps = {
+  application: undefined,
+  onLaunch: undefined,
+};
+
+export default LaunchForm;

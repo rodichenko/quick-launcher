@@ -1,12 +1,13 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import Close from './close';
 import './modal.css';
 
-const hidden_timeout_ms = 100;
+const hiddenTimeoutMs = 100;
 
-export default function Modal(
+function Modal(
   {
     className,
     children,
@@ -14,8 +15,8 @@ export default function Modal(
     onClose,
     closable = true,
     title,
-    closeButton = false
-  }
+    closeButton = false,
+  },
 ) {
   const animationRef = useRef(undefined);
   const [hidden, setHidden] = useState(true);
@@ -27,12 +28,14 @@ export default function Modal(
     if (visible) {
       setHidden(false);
     } else {
-      animationRef.current = setTimeout(() => setHidden(true), hidden_timeout_ms);
+      animationRef.current = setTimeout(() => setHidden(true), hiddenTimeoutMs);
     }
     return () => {
-      animationRef.current && clearTimeout(animationRef.current);
+      if (animationRef.current) {
+        clearTimeout(animationRef.current);
+      }
       animationRef.current = undefined;
-    }
+    };
   }, [visible, setHidden, animationRef]);
   return ReactDOM.createPortal(
     (
@@ -40,11 +43,14 @@ export default function Modal(
         className={
           classNames(
             'modal',
-            {visible, hidden}
+            { visible, hidden },
           )
         }
       >
         <div
+          tabIndex={closable ? 0 : -1}
+          role="button"
+          onKeyPress={closable ? onClose : undefined}
           className={classNames('overlay')}
           onClick={closable ? onClose : undefined}
         >
@@ -53,17 +59,20 @@ export default function Modal(
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row'
+            flexDirection: 'row',
           }}
         >
           <div
             className={
               classNames(
                 className,
-                'window'
+                'window',
               )
             }
-            onClick={e => e.stopPropagation()}
+            tabIndex={-1}
+            role="button"
+            onKeyPress={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             {
               title && (
@@ -89,6 +98,28 @@ export default function Modal(
         </div>
       </div>
     ),
-    document.getElementById('modals')
-  )
+    document.getElementById('modals'),
+  );
 }
+
+Modal.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+  visible: PropTypes.bool,
+  onClose: PropTypes.func,
+  closable: PropTypes.bool,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  closeButton: PropTypes.bool,
+};
+
+Modal.defaultProps = {
+  className: undefined,
+  children: undefined,
+  visible: false,
+  onClose: undefined,
+  closable: true,
+  title: undefined,
+  closeButton: false,
+};
+
+export default Modal;

@@ -1,6 +1,7 @@
-import {escapeRegExp} from './escape-reg-exp';
+/* eslint-disable no-useless-escape */
+import { escapeRegExp } from './escape-reg-exp';
 
-export function pathComponentHasPlaceholder (pathComponent) {
+export function pathComponentHasPlaceholder(pathComponent) {
   return /.*\[[^\[\]]+\].*/.test(pathComponent);
 }
 
@@ -8,7 +9,7 @@ export default function PathComponent(configuration) {
   const {
     path,
     hasPlaceholders,
-    gatewaySpecFile
+    gatewaySpecFile,
   } = configuration;
   const groups = [];
   const regExp = /\[([^\]\[]*)\]/;
@@ -28,16 +29,16 @@ export default function PathComponent(configuration) {
     gatewaySpecFile,
     groups,
     mask: new RegExp(mask, 'i'),
-    parsePathComponent (pathComponent) {
+    parsePathComponent(pathComponent) {
       const info = {};
-      const e = this.mask.exec(pathComponent);
-      if (e && e.length === this.groups.length + 1) {
-        for (let g = 0; g < this.groups.length; g++) {
-          info[this.groups[g]] = e[g + 1];
+      const maskExec = this.mask.exec(pathComponent);
+      if (maskExec && maskExec.length === this.groups.length + 1) {
+        for (let g = 0; g < this.groups.length; g += 1) {
+          info[this.groups[g]] = maskExec[g + 1];
         }
         return info;
       }
       return false;
-    }
+    },
   };
 }

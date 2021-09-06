@@ -3,9 +3,9 @@ import processString from './process-string';
 import getDataStorageItemContent from './cloud-pipeline-api/data-storage-item-content';
 import PathComponent from './utilities/path-component';
 import removeExtraSlash from './utilities/remove-slashes';
-import updateDataStorageItem from "./cloud-pipeline-api/data-storage-item-update";
+import updateDataStorageItem from './cloud-pipeline-api/data-storage-item-update';
 
-function processApplication (application, configuration, settings) {
+function processApplication(application, configuration, settings) {
   const {
     icon,
     path,
@@ -17,41 +17,44 @@ function processApplication (application, configuration, settings) {
   delete info[settings.folderApplicationUserPlaceholder || 'user'];
   return {
     ...rest,
-    icon: icon ? {path: icon} : undefined,
+    icon: icon ? { path: icon } : undefined,
     storage,
     path,
-    info
-  }
+    info,
+  };
 }
 
-function getFolderApplicationsFileConfig (settings, userName) {
+function getFolderApplicationsFileConfig(settings, userName) {
   if (
-    !settings ||
-    !settings.folderApplicationsListStorage ||
-    !settings.folderApplicationsListFile
+    !settings
+    || !settings.folderApplicationsListStorage
+    || !settings.folderApplicationsListFile
   ) {
     return Promise.reject(new Error('Folder applications spec file is not specified'));
   }
   if (!settings.appConfigPath) {
     return Promise.reject(new Error('<appConfigPath> is not specified'));
   }
-  const dataStorageId = parseStoragePlaceholder(settings.folderApplicationsListStorage, {userName});
+  const dataStorageId = parseStoragePlaceholder(
+    settings.folderApplicationsListStorage,
+    { userName },
+  );
   if (Number.isNaN(Number(dataStorageId))) {
     return Promise.reject(new Error(`Unknown folder applications spec file storage: ${dataStorageId}`));
   }
   const path = processString(
     settings.folderApplicationsListFile,
     {
-      [settings.folderApplicationUserPlaceholder || 'user']: userName
-    }
+      [settings.folderApplicationUserPlaceholder || 'user']: userName,
+    },
   );
-  return Promise.resolve({path, storage: dataStorageId});
+  return Promise.resolve({ path, storage: dataStorageId });
 }
 
-export function getApplications (settings, userName) {
+export function getApplications(settings, userName) {
   return new Promise((resolve, reject) => {
     getFolderApplicationsFileConfig(settings, userName)
-      .then(({path, storage: dataStorageId}) => {
+      .then(({ path, storage: dataStorageId }) => {
         getDataStorageItemContent(dataStorageId, path)
           .then((content) => {
             try {
@@ -62,14 +65,14 @@ export function getApplications (settings, userName) {
               const pathComponent = new PathComponent({
                 path: removeExtraSlash(settings.appConfigPath),
                 hasPlaceholders: true,
-                gatewaySpecFile: true
+                gatewaySpecFile: true,
               });
-              resolve(applications.map(app => processApplication(app, pathComponent, settings)));
+              resolve(applications.map((app) => processApplication(app, pathComponent, settings)));
             } catch (e) {
               reject(new Error(`Error parsing folder applications spec file: ${e.message}`));
             }
           })
-          .catch(e => {
+          .catch((e) => {
             reject(new Error(`Error reading folder applications spec file: ${e.message}`));
           });
       })
@@ -77,10 +80,10 @@ export function getApplications (settings, userName) {
   });
 }
 
-export function updateApplication (settings, userName, application) {
+export function updateApplication(settings, userName, application) {
   return new Promise((resolve, reject) => {
     getFolderApplicationsFileConfig(settings, userName)
-      .then(({path, storage: dataStorageId}) => {
+      .then(({ path, storage: dataStorageId }) => {
         getDataStorageItemContent(dataStorageId, path)
           .then((content) => {
             try {
@@ -96,13 +99,12 @@ export function updateApplication (settings, userName, application) {
           .catch(() => resolve([]))
           .then((applications = []) => {
             const index = applications
-              .findIndex(app => removeExtraSlash(app.path) === removeExtraSlash(application.path) &&
-                +(app.storage) === +(application.storage)
-              );
+              .findIndex((app) => removeExtraSlash(app.path) === removeExtraSlash(application.path)
+                && +(app.storage) === +(application.storage));
             const newAppInfo = {
               path: application.path,
               storage: application.storage,
-              icon: application?.iconFile?.path
+              icon: application?.iconFile?.path,
             };
             if (index >= 0) {
               applications.splice(index, 1, newAppInfo);
@@ -112,7 +114,7 @@ export function updateApplication (settings, userName, application) {
             return updateDataStorageItem(
               dataStorageId,
               path,
-              JSON.stringify(applications, undefined, ' ')
+              JSON.stringify(applications, undefined, ' '),
             );
           })
           .then(resolve)
@@ -122,10 +124,10 @@ export function updateApplication (settings, userName, application) {
   });
 }
 
-export function removeApplication (settings, userName, application) {
+export function removeApplication(settings, userName, application) {
   return new Promise((resolve, reject) => {
     getFolderApplicationsFileConfig(settings, userName)
-      .then(({path, storage: dataStorageId}) => {
+      .then(({ path, storage: dataStorageId }) => {
         getDataStorageItemContent(dataStorageId, path)
           .then((content) => {
             try {
@@ -141,16 +143,15 @@ export function removeApplication (settings, userName, application) {
           .catch(() => {})
           .then((applications = []) => {
             const index = applications
-              .findIndex(app => removeExtraSlash(app.path) === removeExtraSlash(application.path) &&
-                +(app.storage) === +(application.storage)
-              );
+              .findIndex((app) => removeExtraSlash(app.path) === removeExtraSlash(application.path)
+                && +(app.storage) === +(application.storage));
             if (index >= 0) {
               applications.splice(index, 1);
             }
             return updateDataStorageItem(
               dataStorageId,
               path,
-              JSON.stringify(applications, undefined, ' ')
+              JSON.stringify(applications, undefined, ' '),
             );
           })
           .then(resolve)

@@ -1,30 +1,31 @@
 const path = require('path');
 const fs = require('fs');
-const {isDevelopmentMode, isProductionMode} = require('./mode');
+const { isDevelopmentMode, isProductionMode } = require('./mode');
 
-function readEnvVarsFile(path) {
-  if (fs.existsSync(path)) {
+function readEnvVarsFile(filePath) {
+  if (fs.existsSync(filePath)) {
     try {
-      return fs.readFileSync(path)
+      return fs.readFileSync(filePath)
         .toString()
         .split('\n')
         .filter(Boolean)
-        .map(line => {
+        .map((line) => {
           const [name, ...valueParts] = line.split('=');
           const value = valueParts.join('=').trim();
           return {
             name: name.trim(),
-            value
+            value,
           };
         })
-        .reduce((r, c) => ({...r, [c.name]: c.value}), {});
+        .reduce((r, c) => ({ ...r, [c.name]: c.value }), {});
+      // eslint-disable-next-line no-empty
     } catch (_) {}
   }
   return {};
 }
 
-function joinEnvVars (vars1, vars2) {
-  const vars = Object.assign({}, vars1);
+function joinEnvVars(vars1, vars2) {
+  const vars = { ...vars1 };
   const keys = Object.keys(vars2);
   for (let k = 0; k < keys.length; k++) {
     const key = keys[k];
@@ -54,20 +55,20 @@ const ENV_VARS = [
   'USE_PARENT_NODE_ID',
   'SHOW_TIMER',
   'PRETTY_URL_DOMAIN',
-  'PRETTY_URL_PATH'
+  'PRETTY_URL_PATH',
 ];
 
 const envVars = ENV_VARS
-  .map(v => ({key: v, value: process.env[v]}))
-  .filter(o => o.value !== undefined)
-  .reduce((r, c) => ({...r, [c.key]: c.value}), {});
+  .map((v) => ({ key: v, value: process.env[v] }))
+  .filter((o) => o.value !== undefined)
+  .reduce((r, c) => ({ ...r, [c.key]: c.value }), {});
 
 const envVarsSources = [
   readEnvVarsFile(path.resolve(__dirname, '../.env')),
   readEnvVarsFile(path.resolve(__dirname, '../.env.local')),
   isDevelopmentMode && readEnvVarsFile(path.resolve(__dirname, '../.env.development.local')),
   isProductionMode && readEnvVarsFile(path.resolve(__dirname, '../.env.production.local')),
-  envVars
+  envVars,
 ].filter(Boolean);
 
 const env = envVarsSources

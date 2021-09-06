@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
-export default function Timer ({className, enabled}) {
+function Timer({ className, enabled }) {
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     if (enabled) {
       setSeconds(0);
-      const timer = setInterval(setSeconds, 1000, o => o + 1);
+      const timer = setInterval(setSeconds, 1000, (o) => o + 1);
       return () => {
         clearInterval(timer);
-      }
+      };
     }
     return () => {};
   }, [enabled, setSeconds]);
@@ -21,3 +22,15 @@ export default function Timer ({className, enabled}) {
   }
   return null;
 }
+
+Timer.propTypes = {
+  className: PropTypes.string,
+  enabled: PropTypes.bool,
+};
+
+Timer.defaultProps = {
+  className: undefined,
+  enabled: false,
+};
+
+export default Timer;

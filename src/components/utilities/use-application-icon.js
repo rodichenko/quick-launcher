@@ -1,9 +1,9 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import downloadDataStorageItem from '../../models/cloud-pipeline-api/data-storage-item-download';
 
-let cache = new Map();
+const cache = new Map();
 
-function wrapDownloadPromise (promise) {
+function wrapDownloadPromise(promise) {
   return new Promise((resolve) => {
     promise
       .then((blob) => {
@@ -20,7 +20,7 @@ function wrapDownloadPromise (promise) {
   });
 }
 
-export default function useApplicationIcon (storage, path) {
+export default function useApplicationIcon(storage, path) {
   const [icon, setIcon] = useState(undefined);
   useEffect(() => {
     if (storage && path) {
@@ -28,7 +28,7 @@ export default function useApplicationIcon (storage, path) {
       if (!cache.has(key)) {
         cache.set(
           key,
-          wrapDownloadPromise(downloadDataStorageItem(storage, path))
+          wrapDownloadPromise(downloadDataStorageItem(storage, path)),
         );
       }
       const promise = cache.get(key);
@@ -43,5 +43,5 @@ export default function useApplicationIcon (storage, path) {
       }
     }
   }, [storage, path]);
-  return {icon, clearCache};
+  return { icon, clearCache };
 }

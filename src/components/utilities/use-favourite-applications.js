@@ -1,29 +1,31 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const KEY = 'FOLDER_APPLICATIONS_FAVOURITES';
 
-export default function useFavouriteApplications () {
+export default function useFavouriteApplications() {
   const [favourites, setFavourites] = useState([]);
   useEffect(() => {
     try {
-      const storageValue = JSON.parse(localStorage.getItem(KEY))
+      const storageValue = JSON.parse(localStorage.getItem(KEY));
       if (Array.isArray(storageValue)) {
         setFavourites(storageValue);
       }
+      // eslint-disable-next-line no-empty
     } catch (_) {}
   }, [setFavourites]);
   const updateFavourites = useCallback((o) => {
     localStorage.setItem(KEY, JSON.stringify(o || []));
     setFavourites(o || []);
   }, [setFavourites]);
-  const isFavourite = useCallback((application) => {
-    return !!application && !!favourites.find(p => application.path === p);
-  }, [favourites]);
+  const isFavourite = useCallback(
+    (application) => !!application && !!favourites.find((p) => application.path === p),
+    [favourites],
+  );
   const onFavouriteChange = useCallback((application, favourite) => {
     if (application) {
       updateFavourites([
-        ...favourites.filter(o => o !== application.path),
-        ...(favourite ? [application.path] : [])
+        ...favourites.filter((o) => o !== application.path),
+        ...(favourite ? [application.path] : []),
       ]);
     }
   }, [favourites, updateFavourites]);
@@ -45,6 +47,6 @@ export default function useFavouriteApplications () {
     isFavourite,
     toggleFavourite,
     onFavouriteChange,
-    sorter
+    sorter,
   };
 }

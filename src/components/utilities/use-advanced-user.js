@@ -1,16 +1,17 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
-export default function useAdvancedUser (settings, user) {
+export default function useAdvancedUser(settings, user) {
   const [canPublishApps, setCanPublishApps] = useState(false);
   const [canEditPublishedApps, setCanEditPublishedApps] = useState(false);
   useEffect(() => {
     if (user && settings) {
-      const {admin, roles = []} = user;
-      const folderApplicationAdvancedUserRoleNames = Array.isArray(settings.folderApplicationAdvancedUserRoleName)
+      const { admin, roles = [] } = user;
+      const folderApplicationAdvancedUserRoleNames = Array
+        .isArray(settings.folderApplicationAdvancedUserRoleName)
         ? new Set(settings.folderApplicationAdvancedUserRoleName)
         : new Set([settings.folderApplicationAdvancedUserRoleName].filter(Boolean));
-      const canPublishAppsValue = admin ||
-        !!(roles.find(role => folderApplicationAdvancedUserRoleNames.has(role.name)));
+      const canPublishAppsValue = admin
+        || !!(roles.find((role) => folderApplicationAdvancedUserRoleNames.has(role.name)));
       setCanPublishApps(canPublishAppsValue);
       setCanEditPublishedApps(admin);
     } else {
@@ -20,6 +21,6 @@ export default function useAdvancedUser (settings, user) {
   }, [settings, user]);
   return {
     canPublishApps,
-    canEditPublishedApps
+    canEditPublishedApps,
   };
 }

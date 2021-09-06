@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './loading-indicator.css';
 
-export default function LoadingIndicator({style, className}) {
+function LoadingIndicator({ style, className }) {
   return (
     <svg
       className={classNames('loading-indicator', className)}
@@ -14,3 +15,16 @@ export default function LoadingIndicator({style, className}) {
     </svg>
   );
 }
+
+LoadingIndicator.propTypes = {
+  className: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  style: PropTypes.object,
+};
+
+LoadingIndicator.defaultProps = {
+  className: undefined,
+  style: undefined,
+};
+
+export default LoadingIndicator;

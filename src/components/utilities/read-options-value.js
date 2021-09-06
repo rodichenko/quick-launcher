@@ -6,7 +6,7 @@ export default function readOptionsValue(options, path) {
   if (subPath.length === 0) {
     return options[root];
   }
-  if (!options.hasOwnProperty(root)) {
+  if (!Object.prototype.hasOwnProperty.call(options, root)) {
     return undefined;
   }
   return readOptionsValue(options[root], subPath.join('.'));

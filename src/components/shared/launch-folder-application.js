@@ -1,15 +1,16 @@
-import React, {useLayoutEffect, useState} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import useApplicationIcon from '../utilities/use-application-icon';
 import UserAttributes from './user-attributes';
-import {useSettings} from '../use-settings';
+import { useSettings } from '../use-settings';
 import Markdown from './markdown';
 import './launch-folder-application.css';
 
-export default function LaunchFolderApplication (
+function LaunchFolderApplication(
   {
-    application
-  }
+    application,
+  },
 ) {
   const {
     iconFile,
@@ -18,14 +19,14 @@ export default function LaunchFolderApplication (
     fullDescription,
     url,
     storage,
-    info = {}
+    info = {},
   } = application || {};
   const settings = useSettings();
-  const {icon} = useApplicationIcon(storage, iconFile ? iconFile.path : undefined);
+  const { icon } = useApplicationIcon(storage, iconFile ? iconFile.path : undefined);
   const pathProperties = Object
     .values(settings?.folderApplicationPathAttributes || {})
-    .filter(propertyName => !/^(name|description|fullDescription)$/i.test(propertyName))
-    .filter(propertyName => !!info[propertyName]);
+    .filter((propertyName) => !/^(name|description|fullDescription)$/i.test(propertyName))
+    .filter((propertyName) => !!info[propertyName]);
   const owner = info?.user;
   const ownerInfo = info?.ownerInfo;
   if (!application) {
@@ -70,7 +71,7 @@ export default function LaunchFolderApplication (
               className={
                 classNames(
                   'launch-folder-application-row',
-                  'launch-folder-application-short-description'
+                  'launch-folder-application-short-description',
                 )
               }
             >
@@ -85,17 +86,17 @@ export default function LaunchFolderApplication (
                 classNames(
                   'launch-folder-application-author',
                   'launch-folder-application-row',
-                  'launch-folder-application-property'
+                  'launch-folder-application-property',
                 )
               }
             >
               <span className="key">Owner:</span>
               <UserAttributes
-                user={{attributes: ownerInfo}}
+                user={{ attributes: ownerInfo }}
                 className={
                   classNames(
                     'launch-folder-application-attributes',
-                    'value'
+                    'value',
                   )
                 }
                 attributeClassName="launch-folder-application-user-attribute"
@@ -111,34 +112,35 @@ export default function LaunchFolderApplication (
                 classNames(
                   'launch-folder-application-author',
                   'launch-folder-application-row',
-                  'launch-folder-application-property'
+                  'launch-folder-application-property',
                 )
               }
             >
               <span className="key">Owner:</span>
               <span className="value">
-              {owner}
-            </span>
+                {owner}
+              </span>
             </div>
           )
         }
         {
-          pathProperties.map(property => (
+          pathProperties.map((property) => (
             <div
               key={property}
               className={
                 classNames(
                   'launch-folder-application-row',
-                  'launch-folder-application-property'
+                  'launch-folder-application-property',
                 )
               }
             >
-            <span className="key">
-              {property}:
-            </span>
+              <span className="key">
+                {property}
+                :
+              </span>
               <span className="value">
-              {info[property]}
-            </span>
+                {info[property]}
+              </span>
             </div>
           ))
         }
@@ -148,10 +150,10 @@ export default function LaunchFolderApplication (
               className={
                 classNames(
                   'launch-folder-application-row',
-                  'launch-folder-application-description'
+                  'launch-folder-application-description',
                 )
               }
-              style={{width: '100%'}}
+              style={{ width: '100%' }}
             >
               {fullDescription}
             </Markdown>
@@ -161,3 +163,14 @@ export default function LaunchFolderApplication (
     </div>
   );
 }
+
+LaunchFolderApplication.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  application: PropTypes.object,
+};
+
+LaunchFolderApplication.defaultProps = {
+  application: undefined,
+};
+
+export default LaunchFolderApplication;
