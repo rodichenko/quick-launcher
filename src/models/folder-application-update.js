@@ -16,7 +16,7 @@ function updateIcon(settings, application, destinationFolder, file) {
     formData.append('file', uploadedFile, `gateway.${file.name.split('.').pop()}`);
     const request = new XMLHttpRequest();
     request.withCredentials = true;
-    request.onreadystatechange = function () {
+    request.onreadystatechange = function onReadyStateChange() {
       if (request.readyState !== 4) return;
       resolve();
     };

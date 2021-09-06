@@ -14,7 +14,7 @@ function removeSlashes(string = '') {
 
 export default function filterAppFn(filter) {
   const path = removeSlashes(filter);
-  return function (app) {
+  return function filterFn(app) {
     return !filter
       || (app.name || '').toLowerCase().includes(filter.toLowerCase())
       || (app.description || '').toLowerCase().includes(filter.toLowerCase())

@@ -8,10 +8,10 @@ function wrapDownloadPromise(promise) {
     promise
       .then((blob) => {
         const fileReader = new FileReader();
-        fileReader.onload = function () {
+        fileReader.onload = function onLoad() {
           resolve(this.result);
         };
-        fileReader.onerror = function () {
+        fileReader.onerror = function onError() {
           resolve(undefined);
         };
         fileReader.readAsDataURL(blob);

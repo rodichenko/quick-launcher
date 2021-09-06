@@ -5,7 +5,7 @@ export default function getToolImage(tool) {
     apiCall(`tool/${tool}/icon`, {}, 'GET', undefined, { isBlob: true })
       .then((blob) => {
         const reader = new FileReader();
-        reader.onloadend = function () {
+        reader.onloadend = function onLoadEnd() {
           resolve(reader.result);
         };
         reader.readAsDataURL(blob);
