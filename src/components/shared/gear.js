@@ -1,7 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function Gear({ className, tabIndex, onClick, children }) {
+function Gear({
+  className,
+  tabIndex,
+  onClick,
+  children,
+}) {
   return (
     <div
       tabIndex={tabIndex}

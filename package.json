@@ -1,12 +1,13 @@
 {
   "name": "quick-launcher",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --mode=development --config webpack.config.js --progress --profile --content-base ./src/",
     "build": "webpack --mode=production",
-    "lint:js": "eslint src",
+    "lint": "npm run-script lint:js && npm run-script lint:css",
+    "lint:js": "eslint src utilities",
     "lint:css": "stylelint src/**/*.css"
   },
   "author": "",

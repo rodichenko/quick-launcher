@@ -27,7 +27,7 @@ function readEnvVarsFile(filePath) {
 function joinEnvVars(vars1, vars2) {
   const vars = { ...vars1 };
   const keys = Object.keys(vars2);
-  for (let k = 0; k < keys.length; k++) {
+  for (let k = 0; k < keys.length; k += 1) {
     const key = keys[k];
     if (vars2[key] !== undefined) {
       vars[key] = vars2[key];

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function Star({ className, tabIndex, onClick, children }) {
+function Star({
+  className, tabIndex, onClick, children,
+}) {
   return (
     <div
       tabIndex={tabIndex}

@@ -1,12 +1,11 @@
 const path = require('path');
-const fs = require('fs');
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const InterpolateHtmlPlugin = require("react-dev-utils/InterpolateHtmlPlugin");
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const env = require('./utilities/envs');
-const {isProductionMode, isDevelopmentMode} = require('./utilities/mode');
+const { isProductionMode, isDevelopmentMode } = require('./utilities/mode');
 
 let publicPath = env.PUBLIC_URL || '/';
 if (!publicPath.endsWith('/')) {
@@ -22,28 +21,28 @@ const limitMounts = env.LIMIT_MOUNTS || 'default';
 const background = env.BACKGROUND || 'assets/background.png';
 
 const globalVariables = {
-  'PUBLIC_URL': publicUrl,
-  'CP_APPLICATIONS_API': cpApplicationsAPI,
-  'CP_APPLICATIONS_TITLE': env.CP_APPLICATIONS_TITLE || 'Applications',
-  'CP_APPLICATIONS_FAVICON': env.FAVICON,
-  'CP_APPLICATIONS_BACKGROUND': background
-    ? ((publicUrl || '') + '/' + background).replace('//', '/')
+  PUBLIC_URL: publicUrl,
+  CP_APPLICATIONS_API: cpApplicationsAPI,
+  CP_APPLICATIONS_TITLE: env.CP_APPLICATIONS_TITLE || 'Applications',
+  CP_APPLICATIONS_FAVICON: env.FAVICON,
+  CP_APPLICATIONS_BACKGROUND: background
+    ? (`${publicUrl || ''}/${background}`).replace('//', '/')
     : undefined,
-  'CP_APPLICATIONS_LOGO': env.LOGO
-    ? ((publicUrl || '') + '/' + env.LOGO).replace('//', '/')
+  CP_APPLICATIONS_LOGO: env.LOGO
+    ? (`${publicUrl || ''}/${env.LOGO}`).replace('//', '/')
     : undefined,
-  'DARK_MODE': darkMode,
-  'CPAPI': isCPAPI,
-  'CP_APPLICATIONS_TAG': env.CP_APPLICATIONS_TAG || 'app_type',
-  'TOOLS': env.USE_CLOUD_PIPELINE_TOOLS === undefined ? 1 : env.USE_CLOUD_PIPELINE_TOOLS,
-  'INITIAL_POLLING_DELAY': initialPollingDelay,
-  'POLLING_INTERVAL': pollingInterval,
-  'LIMIT_MOUNTS': limitMounts,
-  'CP_APPLICATIONS_SUPPORT_NAME': env.CP_APPLICATIONS_SUPPORT_NAME || 'Support team',
-  'USE_PARENT_NODE_ID': [1, true, 'true', '1'].indexOf(env.USE_PARENT_NODE_ID) >= 0,
-  'SHOW_TIMER': [1, true, 'true', '1', undefined].indexOf(env.SHOW_TIMER) >= 0,
-  'PRETTY_URL_DOMAIN': env.PRETTY_URL_DOMAIN,
-  'PRETTY_URL_PATH': env.PRETTY_URL_PATH
+  DARK_MODE: darkMode,
+  CPAPI: isCPAPI,
+  CP_APPLICATIONS_TAG: env.CP_APPLICATIONS_TAG || 'app_type',
+  TOOLS: env.USE_CLOUD_PIPELINE_TOOLS === undefined ? 1 : env.USE_CLOUD_PIPELINE_TOOLS,
+  INITIAL_POLLING_DELAY: initialPollingDelay,
+  POLLING_INTERVAL: pollingInterval,
+  LIMIT_MOUNTS: limitMounts,
+  CP_APPLICATIONS_SUPPORT_NAME: env.CP_APPLICATIONS_SUPPORT_NAME || 'Support team',
+  USE_PARENT_NODE_ID: [1, true, 'true', '1'].indexOf(env.USE_PARENT_NODE_ID) >= 0,
+  SHOW_TIMER: [1, true, 'true', '1', undefined].indexOf(env.SHOW_TIMER) >= 0,
+  PRETTY_URL_DOMAIN: env.PRETTY_URL_DOMAIN,
+  PRETTY_URL_PATH: env.PRETTY_URL_PATH,
 };
 
 console.log('Application will be hosted at:', globalVariables.PUBLIC_URL || '/');
@@ -96,9 +95,10 @@ module.exports = {
       dynamicImport: false,
       // The environment supports 'for of' iteration ('for (const x of array) { ... }').
       forOf: false,
-      // The environment supports ECMAScript Module syntax to import ECMAScript modules (import ... from '...').
-      module: false
-    }
+      // The environment supports ECMAScript Module syntax
+      // to import ECMAScript modules (import ... from '...').
+      module: false,
+    },
   },
   module: {
     rules: [
@@ -106,20 +106,20 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
-        }
+          loader: 'babel-loader',
+        },
       },
       {
         test: /\.html$/,
         use: [
           {
-            loader: 'html-loader'
-          }
-        ]
+            loader: 'html-loader',
+          },
+        ],
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
         test: /\.(png|gif|jpeg|jpg)$/i,
@@ -127,19 +127,19 @@ module.exports = {
         options: {
           name: 'assets/[contenthash].[ext]',
         },
-      }
-    ]
+      },
+    ],
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/bundle.css'
+      filename: 'css/bundle.css',
     }),
     new CopyPlugin({
       patterns: [{
         from: path.resolve(__dirname, 'assets'),
         to: path.resolve(buildDirectory, 'assets'),
-        noErrorOnMissing: true
-      }]
+        noErrorOnMissing: true,
+      }],
     }),
     new HtmlWebPackPlugin({
       template: './src/index.html',
@@ -156,18 +156,18 @@ module.exports = {
         removeStyleLinkTypeAttributes: true,
         keepClosingSlash: true,
         minifyJS: true,
-        minifyCSS: true
-      } : undefined
+        minifyCSS: true,
+      } : undefined,
     }),
     new webpack.DefinePlugin(
       Object.keys(globalVariables)
-        .map(key => ({[key]: JSON.stringify(globalVariables[key])}))
-        .reduce((r, c) => ({...r, ...c}), {})
+        .map((key) => ({ [key]: JSON.stringify(globalVariables[key]) }))
+        .reduce((r, c) => ({ ...r, ...c }), {}),
     ),
     new InterpolateHtmlPlugin(
       HtmlWebPackPlugin,
-      globalVariables
-    )
+      globalVariables,
+    ),
   ],
   optimization: {
     splitChunks: {
@@ -183,9 +183,9 @@ module.exports = {
   devServer: isDevelopmentMode
     ? {
       historyApiFallback: {
-        index: publicPath
+        index: publicPath,
       },
-      port: env.PORT || 8080
+      port: env.PORT || 8080,
     }
     : undefined,
 };

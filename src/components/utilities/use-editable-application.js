@@ -148,7 +148,7 @@ export default function useEditableApplication(application) {
       setNewOwnerInfo(value);
     } else if (/^icon$/i.test(key)) {
       const fileReader = new FileReader();
-      fileReader.onload = function () {
+      fileReader.onload = function onload() {
         setIcon(this.result);
         setIconFile(value);
       };
