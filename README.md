@@ -1,3 +1,5 @@
+# Quick Launcher
+[![Build status](https://app.travis-ci.com/rodichenko/quick-launcher.svg?branch=main)](https://app.travis-ci.com/rodichenko/quick-launcher.svg?branch=main)
 ## Client build instructions
 ### Prerequisites
 * Nodejs (v15) & npm (v7)
