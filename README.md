@@ -1,4 +1,5 @@
 # Quick Launcher
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f67b0daf4f2d4c3eb2042859cbce3ca6)](https://app.codacy.com/gh/rodichenko/quick-launcher?utm_source=github.com&utm_medium=referral&utm_content=rodichenko/quick-launcher&utm_campaign=Badge_Grade_Settings)
 [![Build status](https://app.travis-ci.com/rodichenko/quick-launcher.svg?branch=main)](https://app.travis-ci.com/rodichenko/quick-launcher.svg?branch=main)
 ## Client build instructions
 ### Prerequisites
