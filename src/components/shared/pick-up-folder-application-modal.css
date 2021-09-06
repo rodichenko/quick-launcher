@@ -1,0 +1,109 @@
+.pick-up-application-modal {
+  width: 75vw;
+  max-height: 85vh;
+  min-height: 50vh;
+}
+
+.authentication-error {
+  color: #c24949;
+  margin-top: 10px;
+}
+
+.pick-up-loading {
+  margin-top: 10px;
+  color: #999;
+  font-style: italic;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+}
+
+.filter .filter-input {
+  line-height: 26px;
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid transparent;
+  outline: none;
+  border-radius: 5px;
+  color: white;
+  flex: 1;
+}
+
+.users {
+  margin-top: 5px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.users .user {
+  cursor: pointer;
+  margin: 2px;
+  width: calc(33% - 12px);
+  color: #ccc;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  border-radius: 5px;
+  line-height: 16px;
+}
+
+.users .user .attributes {
+  font-size: x-small;
+  display: flex;
+  flex-wrap: wrap;
+  color: #999;
+}
+
+.users .user .attributes .user-attribute {
+  margin: 2px 2px 2px 0;
+}
+
+.users .user .attributes .user-attribute:not(:last-child)::after {
+  content: ',';
+}
+
+.users .user.current {
+  background-color: rgba(200, 200, 255, 0.2);
+}
+
+.users .user:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.back-to-users {
+  margin-right: 10px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.back-to-users:hover {
+  color: white;
+}
+
+.pick-up-applications {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pick-up-applications .pick-up-application {
+  cursor: pointer;
+  margin: 2px;
+  min-width: 200px;
+  width: calc(33% - 12px);
+  color: #ccc;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 5px;
+}
+
+.pick-up-applications .pick-up-application.ignored {
+  cursor: not-allowed;
+  opacity: 0.25;
+}
