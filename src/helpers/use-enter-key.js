@@ -11,9 +11,7 @@ export function onEnterKey(action, enabled = true) {
     if (action) {
       return action(e);
     }
-    // eslint-disable-next-line no-shadow,no-unused-vars
-    return (e) => {
-    };
+    return undefined;
   };
 }
 
