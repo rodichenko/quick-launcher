@@ -123,7 +123,7 @@ function useLaunch(application, user, options) {
         }
       };
     }
-    return () => {};
+    return undefined;
   }, [
     polling,
     setPolling,
