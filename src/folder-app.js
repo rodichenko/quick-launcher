@@ -20,6 +20,7 @@ import {
 } from './models/validate-folder-application';
 import './components/components.css';
 import './app.css';
+import useEnterKey from './helpers/use-enter-key';
 
 function FolderApp({ location }) {
   const settings = useSettings();
@@ -65,6 +66,8 @@ function FolderApp({ location }) {
     reload();
     setApplication(undefined);
   }, [setApplication, reload]);
+  const goBackKeyPress = useEnterKey(goBack);
+  const onPublishKeyPress = useEnterKey(onPublishClick);
   const onSelectAppToPublish = useCallback((app) => {
     setSelectApplication(false);
     setApplication(app);
@@ -170,7 +173,7 @@ function FolderApp({ location }) {
                   onClick={goBack}
                   role="button"
                   tabIndex={modalIsVisible ? -1 : 0}
-                  onKeyPress={goBack}
+                  onKeyPress={goBackKeyPress}
                   className="link"
                 >
                   BACK TO APPLICATIONS
@@ -203,7 +206,7 @@ function FolderApp({ location }) {
                   className="link"
                   role="button"
                   tabIndex={modalIsVisible ? -1 : 0}
-                  onKeyPress={onPublishClick}
+                  onKeyPress={onPublishKeyPress}
                   onClick={onPublishClick}
                 >
                   NEW APP

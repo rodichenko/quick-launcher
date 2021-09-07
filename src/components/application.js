@@ -14,6 +14,7 @@ import combineUrl from '../models/base/combine-url';
 import processString from '../models/process-string';
 import { StopRunsError } from '../models/find-user-run';
 import './components.css';
+import useEnterKey from '../helpers/use-enter-key';
 
 function stopJobs(runs = []) {
   const wrapStopRun = (run) => new Promise((resolve, reject) => {
@@ -201,6 +202,8 @@ function Application({
   }, [stopJobs, stopRunsError, reLaunch, setStopping]);
   const settings = useContext(SettingsContext);
   useStopLaunch(application, user);
+  const goBackKeyPress = useEnterKey(goBack);
+  const stopRunsAndReLaunchKeyPress = useEnterKey(stopRunsAndReLaunch);
   if (!application) {
     return (
       <div className="content error">
@@ -324,7 +327,7 @@ function Application({
             tabIndex={0}
             className="button"
             onClick={goBack}
-            onKeyPress={goBack}
+            onKeyPress={goBackKeyPress}
           >
             CANCEL
           </div>
@@ -333,7 +336,7 @@ function Application({
             tabIndex={0}
             className="button"
             onClick={stopRunsAndReLaunch}
-            onKeyPress={stopRunsAndReLaunch}
+            onKeyPress={stopRunsAndReLaunchKeyPress}
           >
             OK
           </div>

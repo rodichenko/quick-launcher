@@ -11,6 +11,7 @@ import { useSettings } from './components/use-settings';
 import Modal from './components/shared/modal';
 import './app.css';
 import LoadingIndicator from './components/shared/loading-indicator';
+import useEnterKey, { onEnterKey } from './helpers/use-enter-key';
 
 function Field(
   {
@@ -26,10 +27,10 @@ function Field(
 ) {
   const onChangeCallback = useCallback((e) => onChange(e.target.value), [onChange]);
   const onRedistributeCallback = useCallback((e) => {
-    const redistribute = e.target.checked;
+    const doRedistribute = e.target.checked;
     if (
       // eslint-disable-next-line no-restricted-globals
-      (!redistribute || confirm('All current application info will be lost. Continue?'))
+      (!doRedistribute || confirm('All current application info will be lost. Continue?'))
       && onRedistribute
     ) {
       onRedistribute(e.target.checked);
@@ -251,7 +252,7 @@ Field.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   field: PropTypes.object.isRequired,
   disabled: PropTypes.bool,
-  onRedistribute: PropTypes.func.isRequired,
+  onRedistribute: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onChangeField: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
@@ -261,6 +262,7 @@ Field.propTypes = {
 Field.defaultProps = {
   disabled: false,
   settings: {},
+  onRedistribute: undefined,
 };
 
 function EditFolderApplication(
@@ -303,7 +305,11 @@ function EditFolderApplication(
   }, [publish, setActionError]);
   const doRemove = useCallback(() => {
     remove()
-      .then(goBack)
+      .then((success) => {
+        if (success && goBack) {
+          goBack();
+        }
+      })
       .catch((e) => setActionError(e.message));
   }, [remove, setActionError]);
   const restrictedNames = useMemo(() => applications
@@ -371,6 +377,10 @@ function EditFolderApplication(
     || fieldIsEmpty('description', description)
     || fieldIsEmpty('fullDescription', fullDescription)
     || iconError;
+  const addAttributeKeyPressed = useEnterKey(addAttribute, !disabled);
+  const doRemoveKeyPressed = useEnterKey(doRemove, !disabled);
+  const validateKeyPressed = useEnterKey(validate, !disabled);
+  const doPublishKeyPressed = useEnterKey(doPublish, !disabled && !error);
   if (!application || pending) {
     return null;
   }
@@ -568,7 +578,7 @@ function EditFolderApplication(
                 }
                 tabIndex={0}
                 role="button"
-                onKeyPress={disabled ? undefined : () => removeAttribute(attribute)}
+                onKeyPress={onEnterKey(() => removeAttribute(attribute), !disabled)}
                 onClick={disabled ? undefined : () => removeAttribute(attribute)}
                 style={{ fontSize: 'small' }}
               >
@@ -618,7 +628,7 @@ function EditFolderApplication(
           }
           tabIndex={0}
           role="button"
-          onKeyPress={disabled ? undefined : addAttribute}
+          onKeyPress={addAttributeKeyPressed}
           onClick={disabled ? undefined : addAttribute}
         >
           Add gateway.spec attribute
@@ -712,7 +722,7 @@ function EditFolderApplication(
                 }
                 tabIndex={0}
                 role="button"
-                onKeyPress={disabled ? undefined : doRemove}
+                onKeyPress={doRemoveKeyPressed}
                 onClick={disabled ? undefined : doRemove}
               >
                 REMOVE
@@ -734,11 +744,7 @@ function EditFolderApplication(
                 }
                 tabIndex={0}
                 role="button"
-                onKeyPress={
-                  (disabled)
-                    ? undefined
-                    : validate
-                }
+                onKeyPress={validateKeyPressed}
                 onClick={
                   (disabled)
                     ? undefined
@@ -780,7 +786,7 @@ function EditFolderApplication(
                 }
                 tabIndex={0}
                 role="button"
-                onKeyPress={(disabled || error) ? undefined : doPublish}
+                onKeyPress={doPublishKeyPressed}
                 onClick={(disabled || error) ? undefined : doPublish}
               >
                 {published ? 'UPDATE' : 'PUBLISH'}

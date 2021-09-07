@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import useEnterKey from '../../helpers/use-enter-key';
 
 function Star({
   className, tabIndex, onClick, children,
 }) {
+  const onKeyPress = useEnterKey(onClick);
   return (
     <div
       tabIndex={tabIndex}
       role="button"
-      onKeyPress={onClick}
+      onKeyPress={onKeyPress}
       onClick={onClick}
       className={className}
     >

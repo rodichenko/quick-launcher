@@ -90,13 +90,13 @@ export default function useEditableApplication(application) {
         .then((redistributeApplication) => {
           if (redistributeApplication) {
             const {
-              redistributeIconFile = {},
-              redistributeName,
-              redistributeDescription,
-              redistributeFullDescription,
+              iconFile: redistributeIconFile = {},
+              name: redistributeName,
+              description: redistributeDescription,
+              fullDescription: redistributeFullDescription,
               info = {},
               pathInfo: redistributeApplicationPathInfo = {},
-            } = redistributeApplication || {};
+            } = redistributeApplication;
             setIcon(undefined);
             setIconFile(undefined);
             setAppIconPath(redistributeIconFile.path);
@@ -268,13 +268,13 @@ export default function useEditableApplication(application) {
   useEffect(() => {
     if (application && settings) {
       const {
-        appName,
-        appDescription,
-        appFullDescription,
+        name: appName,
+        description: appDescription,
+        fullDescription: appFullDescription,
         info = {},
         readOnlyAttributes = [],
         pathInfo: initialPathInfo = {},
-      } = application || {};
+      } = application;
       setName(appName);
       setNameInitial(appName);
       setDescription(appDescription);
@@ -335,6 +335,27 @@ export default function useEditableApplication(application) {
     const regExp = new RegExp(`^\s*(${names.join('|')})\s*$`, 'i');
     return regExp.test(o);
   }, [infoFields]);
+  const operationWrapper = useCallback((fn) => {
+    const done = () => {
+      setDisabled(false);
+      setOperation(false);
+    };
+    if (fn && fn.then) {
+      return new Promise((resolve, reject) => {
+        fn
+          .then(() => {
+            done();
+            resolve(true);
+          })
+          .catch((e) => {
+            done();
+            reject(e);
+          });
+      });
+    }
+    done();
+    return Promise.resolve();
+  }, [setDisabled, setOperation]);
   const publish = useCallback(() => {
     setDisabled(true);
     setOperation({
@@ -380,22 +401,12 @@ export default function useEditableApplication(application) {
       details,
       progress: progress || o.progress,
     }));
-    return new Promise((resolve, reject) => {
-      const action = !application.published || redistribute
-        ? folderApplicationPublish
-        : folderApplicationUpdate;
-      action(settings, appPayload, applicationInfo, iconFile, true, progressCallback)
-        .then(() => {
-          setDisabled(false);
-          setOperation(false);
-          resolve();
-        })
-        .catch((e) => {
-          setDisabled(false);
-          setOperation(false);
-          reject(e);
-        });
-    });
+    const action = !application.published || redistribute
+      ? folderApplicationPublish
+      : folderApplicationUpdate;
+    return operationWrapper(
+      action(settings, appPayload, applicationInfo, iconFile, true, progressCallback),
+    );
   }, [
     settings,
     application,
@@ -413,6 +424,7 @@ export default function useEditableApplication(application) {
     pathInfo,
     pathInfoInitial,
     newOwnerInfo,
+    operationWrapper,
   ]);
   const applicationPayload = useMemo(() => {
     const applicationInfo = {
@@ -470,22 +482,12 @@ export default function useEditableApplication(application) {
         details: details || o.details,
         progress: progress || o.progress,
       }));
-      return new Promise((resolve, reject) => {
-        folderApplicationRemove(application, settings, progressCallback)
-          .then(() => {
-            setDisabled(false);
-            setOperation(false);
-            resolve();
-          })
-          .catch((e) => {
-            setDisabled(false);
-            setOperation(false);
-            reject(e);
-          });
-      });
+      return operationWrapper(
+        folderApplicationRemove(application, settings, progressCallback),
+      );
     }
-    return () => Promise.resolve();
-  }, [settings, application, setDisabled, setOperation]);
+    return Promise.resolve(false);
+  }, [settings, application, setDisabled, setOperation, operationWrapper]);
   const { session, validate, stopValidation } = useApplicationSession(applicationPayload);
   return {
     info: {

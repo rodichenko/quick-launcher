@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { useSettings } from '../use-settings';
 import './help.css';
 import Markdown from './markdown';
+import useEnterKey from '../../helpers/use-enter-key';
 
 function Help(
   {
@@ -14,6 +15,8 @@ function Help(
   const show = useCallback(() => setVisible(true), [setVisible]);
   const hide = useCallback(() => setVisible(false), [setVisible]);
   const settings = useSettings();
+  const showKeyPress = useEnterKey(show);
+  const hideKeyPress = useEnterKey(hide);
   if (settings?.help) {
     return (
       <div
@@ -28,7 +31,7 @@ function Help(
         <div
           role="button"
           tabIndex={0}
-          onKeyPress={show}
+          onKeyPress={showKeyPress}
           className="help-button"
           onClick={show}
         >
@@ -39,7 +42,7 @@ function Help(
           onClick={hide}
           role="button"
           tabIndex={0}
-          onKeyPress={hide}
+          onKeyPress={hideKeyPress}
         >
           {'\u00A0'}
         </div>

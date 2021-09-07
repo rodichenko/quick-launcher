@@ -11,6 +11,7 @@ import useAdvancedUser from '../utilities/use-advanced-user';
 import filterAppFn from '../utilities/filter-applications-fn';
 import UserAttributes from './user-attributes';
 import './pick-up-folder-application-modal.css';
+import useEnterKey, { onEnterKey } from '../../helpers/use-enter-key';
 
 function filterUserFn(filter) {
   return function filterFn(user) {
@@ -96,6 +97,10 @@ function PickUpFolderApplicationModal(
     pending: applicationsPending,
   } = useFolderApplications(options, false, ...(user ? [user] : []));
   const title = user ? `Select ${user.userName}'s application` : 'Select user';
+  const clearSelection = useCallback(() => {
+    selectUser(undefined);
+  }, [selectUser]);
+  const clearSelectionKeyPress = useEnterKey(clearSelection);
   return (
     <Modal
       visible={visible}
@@ -149,7 +154,7 @@ function PickUpFolderApplicationModal(
                       }
                       role="button"
                       tabIndex={0}
-                      onKeyPress={() => selectUser(filteredUser)}
+                      onKeyPress={onEnterKey(() => selectUser(filteredUser))}
                       onClick={() => selectUser(filteredUser)}
                     >
                       <div>{filteredUser.name}</div>
@@ -182,8 +187,8 @@ function PickUpFolderApplicationModal(
                     className="back-to-users"
                     tabIndex={0}
                     role="button"
-                    onKeyPress={() => selectUser(undefined)}
-                    onClick={() => selectUser(undefined)}
+                    onKeyPress={clearSelectionKeyPress}
+                    onClick={clearSelection}
                   >
                     {'< BACK'}
                   </div>

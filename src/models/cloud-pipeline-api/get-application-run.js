@@ -24,7 +24,8 @@ export default function getApplicationRun(
     ? new RegExp(`^${prettyUrlCorrected}$`, 'i')
     : undefined;
   return new Promise((resolve, reject) => {
-    let parametersCheck = () => true;
+    // eslint-disable-next-line no-unused-vars
+    let parametersCheck = (run) => true;
     const searchCriteriaDescriptions = [];
     if (dockerImage) {
       searchCriteriaDescriptions.push(`docker image is "${dockerImage}"`);

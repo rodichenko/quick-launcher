@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import useEnterKey from '../../helpers/use-enter-key';
 
 function Close(
   {
@@ -7,12 +8,13 @@ function Close(
     onClick,
   },
 ) {
+  const onKeyPress = useEnterKey(onClick);
   return (
     <div
       tabIndex={0}
       role="button"
       onClick={onClick}
-      onKeyPress={onClick}
+      onKeyPress={onKeyPress}
       className={className}
       style={{
         width: '1em',

@@ -6,6 +6,7 @@ import Gear from './shared/gear';
 import Star from './shared/star';
 import useApplicationIcon from './utilities/use-application-icon';
 import UserAttributes from './shared/user-attributes';
+import useEnterKey from '../helpers/use-enter-key';
 
 function FolderApplicationCard(
   {
@@ -41,6 +42,7 @@ function FolderApplicationCard(
       onClick(application);
     }
   }, [application, onClick]);
+  const onClickKeyPress = useEnterKey(onClickCallback, !disabled);
   const onEditCallback = useCallback((e) => {
     if (onEdit) {
       e.stopPropagation();
@@ -90,7 +92,7 @@ function FolderApplicationCard(
           )
         }
         onClick={disabled ? undefined : onClickCallback}
-        onKeyPress={disabled ? undefined : onClickCallback}
+        onKeyPress={onClickKeyPress}
       >
         <div className="layout">
           {

@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import Close from './close';
 import './modal.css';
+import useEnterKey from '../../helpers/use-enter-key';
 
 const hiddenTimeoutMs = 100;
 
@@ -37,6 +40,10 @@ function Modal(
       animationRef.current = undefined;
     };
   }, [visible, setHidden, animationRef]);
+  const onCloseKeyPress = useEnterKey(onClose, closable);
+  const stopPropagation = useCallback((e) => {
+    e.stopPropagation();
+  }, []);
   return ReactDOM.createPortal(
     (
       <div
@@ -50,7 +57,7 @@ function Modal(
         <div
           tabIndex={closable ? 0 : -1}
           role="button"
-          onKeyPress={closable ? onClose : undefined}
+          onKeyPress={onCloseKeyPress}
           className={classNames('overlay')}
           onClick={closable ? onClose : undefined}
         >
@@ -71,8 +78,8 @@ function Modal(
             }
             tabIndex={-1}
             role="button"
-            onKeyPress={(e) => e.stopPropagation()}
-            onClick={(e) => e.stopPropagation()}
+            onKeyPress={stopPropagation}
+            onClick={stopPropagation}
           >
             {
               title && (

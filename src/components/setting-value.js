@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { onEnterKey } from '../helpers/use-enter-key';
 
 function Selection(
   {
@@ -48,7 +49,7 @@ function Selection(
             }
             tabIndex={0}
             role="button"
-            onKeyPress={handleClick(item)}
+            onKeyPress={onEnterKey(handleClick(item))}
             onClick={handleClick(item)}
           >
             {itemName(item)}

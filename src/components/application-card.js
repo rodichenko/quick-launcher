@@ -10,6 +10,7 @@ import Gear from './shared/gear';
 import SettingValue from './setting-value';
 import './components.css';
 import { useSettings } from './use-settings';
+import useEnterKey from '../helpers/use-enter-key';
 
 function ApplicationCard(
   {
@@ -30,11 +31,6 @@ function ApplicationCard(
   };
   const appExtendedSettings = useContext(ExtendedSettingsContext);
   const hasExtendedSettings = Object.keys(appExtendedSettings).length > 0;
-  // const onExtendedSettingsClicked = useCallback((e) => {
-  //   e && e.stopPropagation();
-  //   e && e.preventDefault();
-  //   onOpenExtendedSettings && onOpenExtendedSettings(application);
-  // }, [onOpenExtendedSettings, appExtendedSettings]);
   const onLaunch = useCallback(() => {
     if (onClick) {
       onClick(appendDefault(extendedOptions));
@@ -103,13 +99,16 @@ function ApplicationCard(
     options,
   ]);
   const hasSessionInfoSettings = appSettings?.sessionInfoStorage && appSettings?.sessionInfoPath;
+  const onLaunchKeyPress = useEnterKey(onLaunch);
+  const onHidePopupKeyPress = useEnterKey(hidePopup);
+  const clearSessionInfoKeyPress = useEnterKey(clearSessionInfoCallback, !clearingSessionInfo);
   return (
     <div
       tabIndex={0}
       role="button"
       className={`app ${DARK_MODE ? 'dark' : ''}`}
       onClick={onLaunch}
-      onKeyPress={onLaunch}
+      onKeyPress={onLaunchKeyPress}
     >
       {
         application.background && (
@@ -171,7 +170,7 @@ function ApplicationCard(
                 role="button"
                 className={classNames('overlay', { visible })}
                 onClick={hidePopup}
-                onKeyPress={hidePopup}
+                onKeyPress={onHidePopupKeyPress}
               >
                 {'\u00A0'}
               </div>
@@ -180,7 +179,7 @@ function ApplicationCard(
                 role="button"
                 className={classNames('popup', { visible })}
                 onClick={hidePopup}
-                onKeyPress={hidePopup}
+                onKeyPress={onHidePopupKeyPress}
               >
                 {
                   appExtendedSettings.map((setting, index, array) => [
@@ -233,11 +232,7 @@ function ApplicationCard(
                           ? undefined
                           : clearSessionInfoCallback
                       }
-                      onKeyPress={
-                        clearingSessionInfo
-                          ? undefined
-                          : clearSessionInfoCallback
-                      }
+                      onKeyPress={clearSessionInfoKeyPress}
                     >
                       {
                         clearingSessionInfo && (

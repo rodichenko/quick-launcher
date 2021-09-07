@@ -6,6 +6,7 @@ import './components.css';
 import { ExtendedSettingsContext } from './utilities/use-extended-settings';
 import useAppExtendedSettings from './utilities/use-app-extended-settings';
 import SettingValue from './setting-value';
+import useEnterKey from '../helpers/use-enter-key';
 
 function LaunchForm(
   {
@@ -27,6 +28,7 @@ function LaunchForm(
       onLaunch(appendDefault(options));
     }
   }, [options, save, onLaunch, appendDefault]);
+  const onLaunchKeyPress = useEnterKey(onLaunchClicked);
   return (
     <div className={classNames('app-launch-form', { dark: DARK_MODE })}>
       <div className="header">
@@ -63,7 +65,7 @@ function LaunchForm(
           role="button"
           className={classNames('launch', 'button')}
           onClick={onLaunchClicked}
-          onKeyPress={onLaunchClicked}
+          onKeyPress={onLaunchKeyPress}
         >
           LAUNCH
         </div>

@@ -11,6 +11,7 @@ import ApplicationCard from './components/application-card';
 import LaunchForm from './components/launch-form';
 import './components/components.css';
 import './app.css';
+import useEnterKey from './helpers/use-enter-key';
 
 function App({ launch, location }) {
   const settings = useSettings();
@@ -26,20 +27,20 @@ function App({ launch, location }) {
   const {
     applications, error, pending, user,
   } = useApplications();
-  const onOpenExtendedLaunchSettings = useCallback((app) => {
-    setLaunchFormApp(app);
+  const onOpenExtendedLaunchSettings = useCallback((aLaunchFormApp) => {
+    setLaunchFormApp(aLaunchFormApp);
   }, [setLaunchFormApp]);
   const back = useCallback(() => {
     setApplication(undefined);
     setLaunchFormApp(undefined);
   }, [setApplication, setLaunchFormApp]);
-  const onSelectApplication = useCallback((app, extended) => {
+  const onSelectApplication = useCallback((aSelectedApplication, extended) => {
     setLaunchExtendedOptions(extended);
-    setApplication(app);
+    setApplication(aSelectedApplication);
   }, [setApplication, setLaunchExtendedOptions]);
-  const onSetExtendedOptions = useCallback((options) => {
+  const onSetExtendedOptions = useCallback((eOptions) => {
     if (launchFormApp) {
-      setLaunchExtendedOptions(options);
+      setLaunchExtendedOptions(eOptions);
       setApplication(launchFormApp.id);
       setLaunchFormApp(undefined);
     }
@@ -68,8 +69,9 @@ function App({ launch, location }) {
       setApplication(appToUse.id);
     }
   }, [application, applications, user, launch, setApplication, settings]);
-  let app; let
-    launchUser;
+  const backKeyPress = useEnterKey(back);
+  let app;
+  let launchUser;
   let options = {};
   if (settings) {
     options = settings.parseUrl(location.href);
@@ -189,7 +191,7 @@ function App({ launch, location }) {
                   role="button"
                   onClick={back}
                   className="link"
-                  onKeyPress={back}
+                  onKeyPress={backKeyPress}
                 >
                   BACK TO APPLICATIONS
                 </div>

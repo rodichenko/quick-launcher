@@ -2,31 +2,27 @@ import combineUrl from './combine-url';
 
 function getSettings() {
   return new Promise((resolve, reject) => {
-    try {
-      fetch(
-        '/settings',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+    fetch(
+      '/settings',
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-        .then((response) => {
-          const codeFamily = Math.ceil(response.status / 100);
-          if (codeFamily === 4 || codeFamily === 5) {
-            reject(new Error(`Response: ${response.status} ${response.statusText}`));
-          } else {
-            response
-              .json()
-              .then(resolve)
-              .catch(reject);
-          }
-        })
-        .catch(reject);
-    } catch (e) {
-      reject(e);
-    }
+      },
+    )
+      .then((response) => {
+        const codeFamily = Math.ceil(response.status / 100);
+        if (codeFamily === 4 || codeFamily === 5) {
+          reject(new Error(`Response: ${response.status} ${response.statusText}`));
+        } else {
+          response
+            .json()
+            .then(resolve)
+            .catch(reject);
+        }
+      })
+      .catch(reject);
   });
 }
 
